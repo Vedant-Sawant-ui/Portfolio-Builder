@@ -8,18 +8,8 @@ const pdf = require('pdf-parse');
 // AI Service Import
 const { generateText } = require("../services/aiService");
 
-// Ensure uploads folder exists
-const storage = multer.diskStorage({
-  destination: "./public/uploads/",
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-const upload = multer({ storage: storage });
+const { parser } = require("../services/cloudinaryService");
+const upload = parser;
 
 // ==================================================
 // 1. GET Request: Render the Dashboard
@@ -151,10 +141,10 @@ router.post('/save-profile', upload.fields([{ name: 'profile_pic', maxCount: 1 }
     // Check if req.files exists before accessing
     if (req.files) {
         if (req.files['profile_pic']) {
-            profile_pic_url = `/uploads/${req.files['profile_pic'][0].filename}`;
+            profile_pic_url = req.files['profile_pic'][0].path;
         }
         if (req.files['resume']) {
-            resume_url = `/uploads/${req.files['resume'][0].filename}`;
+            resume_url = req.files['resume'][0].path;
         }
     }
 
@@ -233,7 +223,7 @@ router.post('/add-project', upload.single('project_image'), async (req, res) => 
     if (!req.session.user_id) return res.redirect('/login');
     const { title, description, project_link, thumbnail_url } = req.body;
     let finalThumbnail = thumbnail_url;
-    if (req.file) finalThumbnail = `/uploads/${req.file.filename}`;
+    if (req.file) finalThumbnail = req.file.path;
 
     try {
         await pool.query(
@@ -265,7 +255,7 @@ router.post('/edit-project/:id', upload.single('project_image'), async (req, res
         let idx = 4;
         if(req.file) {
             q += `, thumbnail_url=$${idx}`;
-            p.push(`/uploads/${req.file.filename}`);
+            p.push(req.file.path);
             idx++;
         }
         q += ` WHERE id=$${idx} AND user_id=$${idx+1}`;
@@ -323,7 +313,7 @@ router.post('/edit-achievement/:id', upload.single('achievement_image'), async (
 router.post('/add-qualification', upload.single('qual_file'), async (req, res) => {
     if (!req.session.user_id) return res.redirect('/login');
     const { type, title, organization, description, start_date, end_date, link_url } = req.body;
-    let file = null; if(req.file) file = `/uploads/${req.file.filename}`;
+    let file = null; if(req.file) file = req.file.path;
     try {
         await pool.query('INSERT INTO qualifications (user_id, type, title, organization, description, start_date, end_date, link_url, file_url) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)',
         [req.session.user_id, type, title, organization, description, start_date||null, end_date||null, link_url, file]);
@@ -378,7 +368,7 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
     }
 
     // Save Resume URL immediately
-    const resumeUrl = `/uploads/${req.file.filename}`;
+    const resumeUrl = req.file.path;
     try {
         await pool.query('UPDATE profiles SET resume_url = $1 WHERE user_id = $2', [resumeUrl, userId]);
     } catch (dbError) {
@@ -388,8 +378,9 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
 
     // Attempt Autofill (Parsing)
     try {
-        const dataBuffer = fs.readFileSync(req.file.path);
-        const pdfData = await pdf(dataBuffer); // This relies on standard pdf-parse 1.1.1
+        const response = await fetch(req.file.path);
+        const dataBuffer = await response.arrayBuffer();
+        const pdfData = await pdf(Buffer.from(dataBuffer)); 
         const extractedText = pdfData.text;
 
         // Comprehensive Prompt

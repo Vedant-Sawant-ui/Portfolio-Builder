@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /u/
+Disallow: /dashboard
+Disallow: /api/
+Sitemap: https://portfolio-builder-fdv7.onrender.com/sitemap.xml

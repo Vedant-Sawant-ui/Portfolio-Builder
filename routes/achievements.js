@@ -4,14 +4,8 @@ const pool = require("../config/db");
 const multer = require("multer");
 const path = require("path");
 
-// 1. Configure Multer for Achievements
-const storage = multer.diskStorage({
-  destination: "./public/uploads/",
-  filename: function (req, file, cb) {
-    cb(null, "achievement-" + Date.now() + path.extname(file.originalname));
-  },
-});
-const upload = multer({ storage: storage });
+const { parser } = require("../services/cloudinaryService");
+const upload = parser;
 
 // GET: Show the form
 router.get("/", (req, res) => {
@@ -55,7 +49,7 @@ router.post("/", (req, res, next) => {
 
             // Use first file as the main/thumbnail image
             if (req.files && req.files.length > 0) {
-                mainImageUrl = `/uploads/${req.files[0].filename}`;
+                mainImageUrl = req.files[0].path;
             }
 
             // 1. Insert Achievement
@@ -69,7 +63,7 @@ router.post("/", (req, res, next) => {
             // 2. Insert Additional Images (store ALL in achievement_images for completeness)
             if (req.files && req.files.length > 0) {
                 for (const file of req.files) {
-                    const imgUrl = `/uploads/${file.filename}`;
+                    const imgUrl = file.path;
                     await pool.query(
                         'INSERT INTO achievement_images (achievement_id, image_url) VALUES ($1, $2)',
                         [achievementId, imgUrl]
