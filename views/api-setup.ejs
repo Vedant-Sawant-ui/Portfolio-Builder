@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Coding APIs - Portfolio Builder</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <div class="container" style="max-width: 600px;">
+            <div class="card">
+                <div class="card-header" style="text-align: center;">
+                    <h2 class="card-title">⚙️ API Configuration</h2>
+                    <p class="card-subtitle">Connect your coding profiles for live stats.</p>
+                </div>
+
+                <form action="/dashboard/api-setup" method="POST">
+
+                    <div class="form-group">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-code" style="color: #ffa116;"></i> LeetCode Username
+                        </label>
+                        <input type="text" name="leetcode_username" class="form-input" placeholder="e.g. neetcode150"
+                            value="<%= apiData.leetcode_username || '' %>">
+                        <small style="color: var(--slate-600); display: block; margin-top: 4px;">Used to fetch your
+                            solved problem counts and badge data.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fab fa-github" style="color: #333;"></i> GitHub Username
+                        </label>
+                        <input type="text" name="github_username" class="form-input" placeholder="e.g. torvalds"
+                            value="<%= apiData.github_username || '' %>">
+                        <small style="color: var(--slate-600); display: block; margin-top: 4px;">Used to display your
+                            repository stars and contribution graph.</small>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary btn-full">Save & Finish</button>
+                        <a href="/dashboard" class="btn btn-secondary btn-full"
+                            style="display: block; text-align: center; margin-top: 10px;">Return to Dashboard</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+</body>
+
+</html>

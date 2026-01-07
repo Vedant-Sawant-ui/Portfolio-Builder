@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project - Portfolio Builder</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .ai-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+            transition: opacity 0.2s;
+        }
+
+        .ai-btn:hover {
+            opacity: 0.9;
+        }
+
+        .ai-status {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-left: 10px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <div class="container" style="max-width: 700px;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">✏️ Edit Project</h2>
+                    <p class="card-subtitle">Update your project details.</p>
+                </div>
+
+                <form action="/dashboard/edit-project/<%= project.id %>" method="POST" enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label class="form-label">Project Title</label>
+                        <input type="text" name="title" class="form-input" value="<%= project.title %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label class="form-label" style="margin-bottom: 0;">Description</label>
+                            <div style="display: flex; align-items: center;">
+                                <span id="desc-ai-status" class="ai-status"><i class="fas fa-spinner fa-spin"></i>
+                                    Improving...</span>
+                                <button type="button" class="ai-btn"
+                                    onclick="upgradeText('desc-input', 'desc-ai-status')">
+                                    <i class="fas fa-sparkles"></i> Upgrade with AI
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="desc-input" name="description" class="form-textarea"
+                            rows="4"><%= project.description %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Project Link</label>
+                        <input type="url" name="project_link" class="form-input" value="<%= project.project_link %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Project Image</label>
+
+                        <% if (project.thumbnail_url) { %>
+                            <div style="margin-bottom: 10px;">
+                                <p style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 5px;">Current
+                                    Image:</p>
+                                <img src="<%= project.thumbnail_url %>"
+                                    style="height: 100px; border-radius: 8px; border: 1px solid var(--slate-200);">
+                            </div>
+                            <% } %>
+
+                                <div
+                                    style="background: var(--slate-50); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--slate-200);">
+                                    <label
+                                        style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500;">
+                                        Upload New Image (Optional)
+                                    </label>
+
+                                    <input type="file" name="project_image" accept="image/*"
+                                        style="margin-bottom: 15px; display: block; width: 100%;" id="project-file">
+
+                                    <div id="image-preview" style="margin-bottom: 15px; min-height: 20px;"></div>
+                                </div>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">Update Project</button>
+                        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('project-file').addEventListener('change', function (e) {
+                const container = document.getElementById('image-preview');
+                container.innerHTML = '';
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '200px';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '8px';
+                        img.style.border = '1px solid #ddd';
+                        container.appendChild(img);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            async function upgradeText(inputId, statusId) {
+                const inputEl = document.getElementById(inputId);
+                const statusEl = document.getElementById(statusId);
+                const originalText = inputEl.value;
+
+                if (!originalText || originalText.length < 5) {
+                    alert("Please enter some text first.");
+                    return;
+                }
+
+                statusEl.style.display = 'inline-flex';
+
+                try {
+                    const response = await fetch('/dashboard/api/upgrade-text', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: originalText })
+                    });
+                    const data = await response.json();
+
+                    if (data.upgradedText) {
+                        const improvedText = data.upgradedText;
+
+                        let parent = inputEl.parentElement;
+                        let existingControl = parent.querySelector('.ai-controls');
+                        if (existingControl) existingControl.remove();
+
+                        inputEl.value = improvedText;
+                        inputEl.style.background = "#eff6ff";
+
+                        const controls = document.createElement('div');
+                        controls.className = 'ai-controls';
+                        controls.style.marginTop = '10px';
+                        controls.style.display = 'flex';
+                        controls.style.gap = '10px';
+                        controls.innerHTML = `
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-accept" style="background: var(--success); border:none;">Accept</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-decline">Decline</button>
+                        `;
+
+                        inputEl.insertAdjacentElement('afterend', controls);
+
+                        controls.querySelector('#btn-accept').addEventListener('click', () => {
+                            inputEl.style.background = "white";
+                            controls.remove();
+                        });
+
+                        controls.querySelector('#btn-decline').addEventListener('click', () => {
+                            inputEl.value = originalText;
+                            inputEl.style.background = "white";
+                            controls.remove();
+                        });
+                    }
+                } catch (e) {
+                    console.error("AI Error", e);
+                    alert("Failed to connect to AI");
+                } finally {
+                    statusEl.style.display = 'none';
+                }
+            }
+        </script>
+</body>
+
+</html>

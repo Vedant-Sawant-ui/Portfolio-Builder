@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - Portfolio Builder</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('/images/light_portfolio_builder_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            background: transparent !important;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/header') %>
+        <div class="auth-container">
+            <div class="card auth-card">
+                <div class="card-header" style="text-align: center;">
+                    <h2 class="card-title">Verify OTP</h2>
+                    <p class="card-subtitle">Enter the 6-digit code sent to your email</p>
+                </div>
+
+                <% if (typeof error_msg !=='undefined' && error_msg.length> 0) { %>
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <%= error_msg %><br>
+                            <small>Please check the OTP and try again, or <a href="/register"
+                                    style="color: white; text-decoration: underline;">start over</a>.</small>
+                    </div>
+                    <% } %>
+
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <p style="font-size: 0.9rem; color: var(--slate-600);">OTP valid for:</p>
+                            <div id="countdown" style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">05:00</div>
+                        </div>
+
+                        <form action="/verify-otp" method="POST">
+                            <input type="hidden" name="email" value="<%= email %>">
+                            <input type="hidden" name="mode" value="<%= mode %>">
+                            <div class="form-group">
+                                <label class="form-label">6-Digit OTP</label>
+                                <input type="text" name="otp" class="form-input" placeholder="000000" maxlength="6"
+                                    required pattern="\d{6}">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-full">Verify & Proceed</button>
+                        </form>
+
+                        <p style="margin-top: 24px; text-align: center; font-size: 0.9rem; color: var(--slate-600);">
+                            Didn't receive code? <a href="/register">Try again</a>
+                        </p>
+            </div>
+        </div>
+
+        <script>
+            let timeLeft = 300; // 5 minutes in seconds
+            const timerDisplay = document.getElementById('countdown');
+
+            const timer = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert('OTP has expired. Please sign up again.');
+                    window.location.href = '/register';
+                }
+                timeLeft--;
+            }, 1000);
+        </script>
+</body>
+
+</html>

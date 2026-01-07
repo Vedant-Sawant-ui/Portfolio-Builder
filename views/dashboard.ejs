@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Portfolio Builder</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Theme Selector Styles */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .theme-option {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-option.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .theme-preview {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .theme-name {
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 5px;
+            background: #fff;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Resume Upload Styles */
+        .resume-drop-zone {
+            border: 2px dashed var(--slate-300);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            background: var(--slate-50);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .resume-drop-zone:hover {
+            border-color: var(--primary);
+            background: #f0fdfa;
+            /* light teal tint */
+        }
+
+        /* AI Button Styles */
+        .ai-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .ai-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* AI Status Indicator */
+        .ai-status {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-left: 10px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+
+            /* Theme Previews in Dashboard */
+            /* Dark Mode Preview */
+            body.static_dark_mode-preview,
+            body.dynamic_neural-preview,
+            body.dynamic_cybergrid-preview {
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+            }
+
+            body.static_dark_mode-preview .card,
+            body.dynamic_neural-preview .card,
+            body.dynamic_cybergrid-preview .card {
+                background-color: #2d2d2d;
+                border-color: #404040;
+                color: #e0e0e0;
+            }
+
+            body.static_dark_mode-preview .section-header h2,
+            body.dynamic_neural-preview .section-header h2 {
+                color: #fff;
+            }
+
+            body.static_dark_mode-preview .form-input,
+            body.static_dark_mode-preview .form-textarea {
+                background-color: #333;
+                border-color: #555;
+                color: #fff;
+            }
+
+            /* Blue/Corporate Preview */
+            body.static_corporate_blue-preview .card {
+                border-top: 3px solid #0056b3;
+            }
+
+            /* Codeverse/Terminal Preview */
+            body.dynamic_codeverse-preview,
+            body.dynamic_terminal-preview {
+                font-family: 'Courier New', Courier, monospace;
+            }
+    </style>
+</head>
+
+<body class="<%= profile.theme_preference || 'static_minimalist' %>-preview">
+
+    <%- include('partials/header') %>
+
+        <div class="container">
+
+            <!-- THEME PREVIEW BANNER -->
+            <% if(profile && profile.theme_preference) { %>
+                <div style="text-align: right; margin-bottom: 10px; font-size: 0.85rem; color: var(--slate-500);">
+                    Current Theme: <span style="font-weight: bold; color: var(--primary); text-transform: capitalize;">
+                        <%= profile.theme_preference.replace(/_/g, ' ' ) %>
+                    </span>
+                </div>
+                <% } %>
+
+                    <div class="card"
+                        style="margin-bottom: 30px; border-left: 5px solid <%= profile && profile.is_published ? 'var(--success)' : 'var(--slate-400)' %>;">
+                        <div class="section-header"
+                            style="margin-top: 0; flex-direction: column; align-items: flex-start; gap: 15px;">
+                            <h1 style="margin: 0; width: 100%;">Welcome, <%= user.username %> 👋🏻!</h1>
+                            <div
+                                style="display: flex; align-items: center; gap: 15px; width: 100%; justify-content: space-between; border-top: 1px solid var(--slate-100); padding-top: 10px;">
+                                <h2 style="margin: 0; font-size: 1.1rem;"><i class="fas fa-rocket"></i> Deployment
+                                    Status</h2>
+                                <form action="/dashboard/toggle-publish" method="POST" style="margin:0;">
+                                    <button type="submit"
+                                        class="btn <%= profile && profile.is_published ? 'btn-success' : 'btn-secondary' %>">
+                                        <%= profile && profile.is_published ? 'Published ✅' : 'Unpublished ❌' %>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div
+                            style="background: var(--slate-50); padding: 15px; border-radius: 8px; border: 1px solid var(--slate-200);">
+                            <label
+                                style="font-size: 0.85rem; font-weight: 600; color: var(--slate-600); display: block; margin-bottom: 5px;">Your
+                                Portfolio Link:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" value="<%= 'http://localhost:3000/' + user.username %>" readonly
+                                    class="form-input" style="background: white;" id="portfolio-link-input">
+                                <button class="btn btn-primary" onclick="copyLinkInput()"><i class="fas fa-copy"></i>
+                                    Copy</button>
+                                <a href="/<%= user.username %>" target="_blank" class="btn btn-secondary"><i
+                                        class="fas fa-external-link-alt"></i>
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Success/Error Messages -->
+                    <% if (success_msg && success_msg.length> 0) { %>
+                        <div class="alert alert-success">
+                            <%= success_msg %>
+                        </div>
+                        <% } %>
+                            <% if (error_msg && error_msg.length> 0) { %>
+                                <div class="alert alert-error">
+                                    <%= error_msg %>
+                                </div>
+                                <% } %>
+
+                                    <div class="grid-dashboard">
+                                        <!-- Left Column: Profile & Resume -->
+                                        <div style="grid-column: span 1;">
+                                            <div class="card">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Profile Settings</h2>
+                                                </div>
+                                                <form action="/dashboard/save-profile" method="POST"
+                                                    enctype="multipart/form-data" id="profileForm">
+                                                    <div class="form-group">
+                                                        <label class="form-label">Full Name</label>
+                                                        <input type="text" name="full_name" class="form-input"
+                                                            value="<%= profile?.full_name || '' %>" required>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="form-label">Profile Picture</label>
+                                                        <% if (profile?.profile_pic_url) { %>
+                                                            <div style="margin-bottom: 10px;">
+                                                                <img src="<%= profile.profile_pic_url %>"
+                                                                    alt="Current Pic"
+                                                                    style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                                                            </div>
+                                                            <% } %>
+                                                                <input type="file" name="profile_pic" accept="image/*"
+                                                                    class="form-input" style="width: auto;">
+                                                    </div>
+
+                                                    <!-- UNIFIED RESUME SECTION -->
+                                                    <div class="form-group"
+                                                        style="background: white; padding: 15px; border: 1px solid var(--slate-200); border-radius: 8px;">
+                                                        <label class="form-label"
+                                                            style="display: flex; justify-content: space-between; align-items: center;">
+                                                            Resume / CV
+                                                            <% if (profile?.resume_url) { %>
+                                                                <span
+                                                                    style="color: var(--success); font-size: 0.8rem;"><i
+                                                                        class="fas fa-check-circle"></i> Uploaded</span>
+                                                                <% } %>
+                                                        </label>
+
+                                                        <div class="resume-drop-zone"
+                                                            onclick="document.getElementById('resume-input').click()">
+                                                            <i class="fas fa-cloud-upload-alt"
+                                                                style="font-size: 2rem; color: var(--slate-400); margin-bottom: 10px;"></i>
+                                                            <p style="margin: 0; font-weight: 500;">Click to upload PDF
+                                                            </p>
+                                                            <p
+                                                                style="margin: 0; font-size: 0.8rem; color: var(--slate-500);">
+                                                                or
+                                                                drop file here</p>
+                                                            <input type="file" name="resume" accept=".pdf"
+                                                                id="resume-input" style="display: none;"
+                                                                onchange="handleResumeSelect(this)">
+                                                        </div>
+                                                        <div id="resume-file-name"
+                                                            style="margin-top: 8px; font-size: 0.85rem; color: var(--slate-700); font-weight: 600;">
+                                                        </div>
+
+                                                        <!-- "🌟Autofill with AI" Button (Hidden by default) -->
+                                                        <div id="ai-autofill-btn"
+                                                            style="display: none; margin-top: 15px; text-align: center;">
+                                                            <button type="button" onclick="triggerResumeParse()" style="
+                                                                        background: linear-gradient(135deg, #6366f1, #d946ef);
+                                                                        color: white;
+                                                                        border: none;
+                                                                        padding: 10px 20px;
+                                                                        border-radius: 30px;
+                                                                        font-weight: bold;
+                                                                        font-size: 1rem;
+                                                                        cursor: pointer;
+                                                                        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+                                                                        transition: transform 0.2s;
+                                                                        display: inline-flex;
+                                                                        align-items: center;
+                                                                        gap: 8px;
+                                                                    " onmouseover="this.style.transform='scale(1.05)'"
+                                                                onmouseout="this.style.transform='scale(1)'">
+                                                                🌟 Autofill with AI
+                                                            </button>
+                                                            <p
+                                                                style="margin-top: 8px; font-size: 0.8rem; color: var(--slate-500);">
+                                                                Click to automatically extract Bio, Skills, Projects,
+                                                                and more!
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div
+                                                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                                            <label class="form-label" style="margin:0;">Bio</label>
+                                                            <!-- RESTORED: Explicit AI Button -->
+                                                            <button type="button" class="ai-btn"
+                                                                onclick="upgradeText('bio-input', 'bio-status')">
+                                                                <i class="fas fa-sparkles"></i> Upgrade with AI
+                                                            </button>
+                                                        </div>
+                                                        <textarea name="bio" id="bio-input" class="form-textarea"
+                                                            placeholder="Tell us about yourself..."
+                                                            rows="4"><%= profile?.bio || '' %></textarea>
+                                                        <span id="bio-status" class="ai-status"
+                                                            style="margin-top: 5px;"><i
+                                                                class="fas fa-spinner fa-spin"></i> Improving...</span>
+                                                    </div>
+
+                                                    <button type="submit" class="btn btn-primary"
+                                                        style="width: 100%;">Save
+                                                        Profile</button>
+                                                </form>
+                                            </div>
+
+                                            <!-- Theme Selection with "Show More" -->
+                                            <div class="card" style="margin-top: 30px;">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Portfolio Theme</h2>
+                                                </div>
+                                                <form action="/dashboard/save-profile" method="POST" id="themeForm">
+                                                    <!-- FIXED: Name is theme_preference to match backend -->
+                                                    <input type="hidden" name="theme_preference" id="selected-theme"
+                                                        value="<%= profile?.theme_preference || 'static_minimalist' %>">
+
+                                                    <!-- Initial 8 Themes -->
+                                                    <div class="theme-grid">
+                                                        <!-- Dynamic Themes -->
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('dynamic_codeverse')"
+                                                            data-theme="dynamic_codeverse">
+                                                            <div class="theme-preview"
+                                                                style="background: #0f172a; color: #fff;">Code</div>
+                                                            <div class="theme-name">Codeverse</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('dynamic_neural')"
+                                                            data-theme="dynamic_neural">
+                                                            <div class="theme-preview"
+                                                                style="background: #111; color: #00e5ff;">Neural</div>
+                                                            <div class="theme-name">Neural</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('dynamic_liquid')"
+                                                            data-theme="dynamic_liquid">
+                                                            <div class="theme-preview"
+                                                                style="background: #fff; color: #6c5ce7;">Liquid</div>
+                                                            <div class="theme-name">Liquid</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('dynamic_cybergrid')"
+                                                            data-theme="dynamic_cybergrid">
+                                                            <div class="theme-preview"
+                                                                style="background: #000; color: #00ffcc;">Cyber</div>
+                                                            <div class="theme-name">Cyber Grid</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('dynamic_terminal')"
+                                                            data-theme="dynamic_terminal">
+                                                            <div class="theme-preview"
+                                                                style="background: #000; color: #0f0;">
+                                                                Terminal</div>
+                                                            <div class="theme-name">Terminal</div>
+                                                        </div>
+
+                                                        <!-- Static Top Picks -->
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('static_minimalist')"
+                                                            data-theme="static_minimalist">
+                                                            <div class="theme-preview"
+                                                                style="background: #fff; color: #333; border: 1px solid #ddd;">
+                                                                Minimal</div>
+                                                            <div class="theme-name">Minimalist</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('static_dark_mode')"
+                                                            data-theme="static_dark_mode">
+                                                            <div class="theme-preview"
+                                                                style="background: #1e1e1e; color: #e0e0e0;">Dark</div>
+                                                            <div class="theme-name">Dark Mode</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('static_corporate_blue')"
+                                                            data-theme="static_corporate_blue">
+                                                            <div class="theme-preview"
+                                                                style="background: #fff; color: #0056b3; border: 1px solid #ddd;">
+                                                                Corp Blue</div>
+                                                            <div class="theme-name">Corporate</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Hidden Remaining Themes -->
+                                                    <div id="more-themes" class="theme-grid"
+                                                        style="display: none; margin-top: 15px;">
+                                                        <div class="theme-option" onclick="selectTheme('static_swiss')"
+                                                            data-theme="static_swiss">
+                                                            <div class="theme-preview"
+                                                                style="background: #f5f5f5; color: #d00;">Swiss</div>
+                                                            <div class="theme-name">Swiss</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('static_tech_startup')"
+                                                            data-theme="static_tech_startup">
+                                                            <div class="theme-preview"
+                                                                style="background: #fff; color: #6366f1; border: 1px solid #ddd;">
+                                                                Startup</div>
+                                                            <div class="theme-name">Tech Startup</div>
+                                                        </div>
+                                                        <div class="theme-option" onclick="selectTheme('static_lawyer')"
+                                                            data-theme="static_lawyer">
+                                                            <div class="theme-preview"
+                                                                style="background: #fff; color: #2c3e50; font-family: serif; border: 1px solid #ddd;">
+                                                                Lawyer</div>
+                                                            <div class="theme-name">Lawyer</div>
+                                                        </div>
+                                                        <div class="theme-option" onclick="selectTheme('static_forest')"
+                                                            data-theme="static_forest">
+                                                            <div class="theme-preview"
+                                                                style="background: #1a2f1a; color: #e8f5e9;">Forest
+                                                            </div>
+                                                            <div class="theme-name">Forest</div>
+                                                        </div>
+                                                        <div class="theme-option" onclick="selectTheme('static_sunset')"
+                                                            data-theme="static_sunset">
+                                                            <div class="theme-preview"
+                                                                style="background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); color: #fff;">
+                                                                Sunset</div>
+                                                            <div class="theme-name">Sunset</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('static_monochrome')"
+                                                            data-theme="static_monochrome">
+                                                            <div class="theme-preview"
+                                                                style="background: #333; color: #fff;">
+                                                                Mono</div>
+                                                            <div class="theme-name">Monochrome</div>
+                                                        </div>
+                                                        <div class="theme-option" onclick="selectTheme('static_pastel')"
+                                                            data-theme="static_pastel">
+                                                            <div class="theme-preview"
+                                                                style="background: #fdf2f8; color: #831843;">Pastel
+                                                            </div>
+                                                            <div class="theme-name">Pastel</div>
+                                                        </div>
+                                                        <div class="theme-option" onclick="selectTheme('static_glass')"
+                                                            data-theme="static_glass">
+                                                            <div class="theme-preview"
+                                                                style="background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1)); color: #333; border: 1px solid #ccc;">
+                                                                Glass</div>
+                                                            <div class="theme-name">Glass</div>
+                                                        </div>
+                                                        <div class="theme-option"
+                                                            onclick="selectTheme('static_brutalist')"
+                                                            data-theme="static_brutalist">
+                                                            <div class="theme-preview"
+                                                                style="background: #fff; color: #000; border: 2px solid #000; box-shadow: 2px 2px 0 #000;">
+                                                                BRUTAL</div>
+                                                            <div class="theme-name">Brutalist</div>
+                                                        </div>
+                                                        <div class="theme-option" onclick="selectTheme('static_retro')"
+                                                            data-theme="static_retro">
+                                                            <div class="theme-preview"
+                                                                style="background: #f0e6d2; color: #5c4b51;">Retro</div>
+                                                            <div class="theme-name">Retro</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <button type="button" id="show-more-btn"
+                                                        class="btn btn-secondary btn-sm"
+                                                        style="width: 100%; margin-top: 15px;" onclick="toggleThemes()">
+                                                        Show More Themes <i class="fas fa-chevron-down"></i>
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-primary"
+                                                        style="margin-top: 20px; width: 100%;">Update Theme</button>
+                                                </form>
+                                            </div>
+
+                                            <!-- Skills -->
+                                            <div class="card" style="margin-top: 30px;">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Skills</h2>
+                                                    <button onclick="addSkill()" class="btn btn-primary btn-sm"><i
+                                                            class="fas fa-plus"></i> Add</button>
+                                                </div>
+                                                <form action="/dashboard/save-skills" method="POST">
+                                                    <div id="skills-container"
+                                                        style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                                                        <% if (typeof skills !=='undefined' ) { %>
+                                                            <% skills.forEach((skill, index)=> { %>
+                                                                <div class="skill-input-group"
+                                                                    style="display: flex; gap: 5px;">
+                                                                    <input type="text" name="skills[]"
+                                                                        value="<%= skill.skill_name %>"
+                                                                        class="form-input"
+                                                                        style="width: 120px; padding: 6px;">
+                                                                    <button type="button" class="btn btn-delete"
+                                                                        onclick="this.parentElement.remove()"
+                                                                        style="padding: 0 8px;">&times;</button>
+                                                                </div>
+                                                                <% }) %>
+                                                                    <% } %>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">Save Skills</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Column: Projects, Achievements, Socials -->
+                                        <div style="grid-column: span 2;">
+
+                                            <!-- Coding Profiles Section -->
+                                            <div class="card" style="margin-bottom: 30px;">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Coding Profiles</h2>
+                                                    <a href="/dashboard/api-setup" class="btn btn-primary btn-sm"><i
+                                                            class="fas fa-cog"></i> Configure</a>
+                                                </div>
+                                                <div class="grid-stats"
+                                                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                                    <div
+                                                        style="background: var(--slate-50); padding: 15px; border-radius: 8px; border: 1px solid var(--slate-200); display: flex; align-items: center; gap: 10px;">
+                                                        <i class="fas fa-code"
+                                                            style="color: #ffa116; font-size: 1.5rem;"></i>
+                                                        <div>
+                                                            <div style="font-weight: 600;">LeetCode</div>
+                                                            <div style="font-size: 0.85rem; color: var(--slate-500);">
+                                                                Live
+                                                                Stats</div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        style="background: var(--slate-50); padding: 15px; border-radius: 8px; border: 1px solid var(--slate-200); display: flex; align-items: center; gap: 10px;">
+                                                        <i class="fab fa-github"
+                                                            style="color: #333; font-size: 1.5rem;"></i>
+                                                        <div>
+                                                            <div style="font-weight: 600;">GitHub</div>
+                                                            <div style="font-size: 0.85rem; color: var(--slate-500);">
+                                                                Repositories</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <!-- Qualification Section -->
+                                            <div class="card">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Qualifications / Experience</h2>
+                                                    <a href="/dashboard/add-qualification"
+                                                        class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add
+                                                        New</a>
+                                                </div>
+                                                <% if (typeof qualifications !=='undefined' && qualifications.length> 0)
+                                                    { %>
+                                                    <% qualifications.forEach(qual=> { %>
+                                                        <div class="list-item">
+                                                            <div>
+                                                                <div style="font-weight: 600; font-size: 1.05rem;">
+                                                                    <%= qual.title %>
+                                                                </div>
+                                                                <div
+                                                                    style="color: var(--slate-600); font-size: 0.9rem;">
+                                                                    <%= qual.organization %> • <span
+                                                                            style="background: var(--slate-100); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">
+                                                                            <%= qual.type %>
+                                                                        </span>
+                                                                </div>
+                                                            </div>
+                                                            <div style="display:flex; gap:10px;">
+                                                                <!-- Edit logic handled by delete/re-add for now, deleting works -->
+                                                                <form
+                                                                    action="/dashboard/delete-qualification/<%= qual.id %>"
+                                                                    method="POST" style="margin: 0;">
+                                                                    <button type="submit" class="btn btn-delete btn-sm"
+                                                                        onclick="return confirm('Delete this item?')"><i
+                                                                            class="fas fa-trash"></i></button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <div
+                                                                    style="text-align: center; padding: 20px; color: var(--slate-600); background: var(--slate-50); border-radius: var(--radius-md);">
+                                                                    No qualifications added yet.
+                                                                </div>
+                                                                <% } %>
+                                            </div>
+
+                                            <!-- Projects Section -->
+                                            <div class="card" style="margin-top: 30px;">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Projects</h2>
+                                                    <a href="/dashboard/add-project" class="btn btn-primary btn-sm"><i
+                                                            class="fas fa-plus"></i> Add
+                                                        Project</a>
+                                                </div>
+                                                <% if (typeof projects !=='undefined' && projects.length> 0) { %>
+                                                    <div
+                                                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                                                        <% projects.forEach(project=> { %>
+                                                            <div
+                                                                style="border: 1px solid var(--slate-200); border-radius: var(--radius-md); overflow: hidden;">
+                                                                <div style="padding: 16px;">
+                                                                    <div style="font-weight: 600; margin-bottom: 5px;">
+                                                                        <%= project.title %>
+                                                                    </div>
+                                                                    <div
+                                                                        style="font-size: 0.9rem; color: var(--slate-600); margin-bottom: 10px;">
+                                                                        <%= project.description ?
+                                                                            project.description.substring(0, 100)
+                                                                            + '...' : '' %>
+                                                                    </div>
+                                                                </div>
+                                                                <div
+                                                                    style="background: var(--slate-50); padding: 10px 16px; border-top: 1px solid var(--slate-200); display: flex; justify-content: flex-end; gap: 10px;">
+                                                                    <!-- Edit Button -->
+                                                                    <a href="/dashboard/edit-project/<%= project.id %>"
+                                                                        class="btn btn-secondary btn-sm"
+                                                                        style="background: white; border: 1px solid var(--slate-300);">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                    <form
+                                                                        action="/dashboard/delete-project/<%= project.id %>"
+                                                                        method="POST" style="margin: 0;">
+                                                                        <button type="submit"
+                                                                            class="btn btn-delete btn-sm"
+                                                                            onclick="return confirm('Delete this project?')">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <% }) %>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <div
+                                                            style="text-align: center; padding: 20px; color: var(--slate-600); background: var(--slate-50); border-radius: var(--radius-md);">
+                                                            No projects added yet.
+                                                        </div>
+                                                        <% } %>
+                                            </div>
+
+                                            <!-- Achievements Section -->
+                                            <div class="card" style="margin-top: 30px;">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Achievements</h2>
+                                                    <a href="/dashboard/achievements" class="btn btn-primary btn-sm"><i
+                                                            class="fas fa-plus"></i> Manage
+                                                        Achievements</a>
+                                                </div>
+                                                <% if (typeof achievements !=='undefined' && achievements.length> 0) {
+                                                    %>
+                                                    <div style="display: grid; gap: 15px;">
+                                                        <% achievements.forEach(achievement=> { %>
+                                                            <div
+                                                                style="background: var(--slate-50); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: start;">
+                                                                <div
+                                                                    style="display: flex; gap: 15px; align-items: flex-start;">
+                                                                    <% if (achievement.image_url) { %>
+                                                                        <img src="<%= achievement.image_url %>"
+                                                                            alt="Achievement"
+                                                                            style="width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--slate-300);">
+                                                                        <% } else { %>
+                                                                            <div
+                                                                                style="width: 60px; height: 60px; background: var(--slate-200); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--slate-400);">
+                                                                                <i class="fas fa-trophy"
+                                                                                    style="font-size: 24px;"></i>
+                                                                            </div>
+                                                                            <% } %>
+                                                                                <div>
+                                                                                    <div
+                                                                                        style="font-weight: 600; font-size: 1.05rem; margin-bottom: 4px;">
+                                                                                        <%= achievement.title %>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        style="color: var(--slate-500); font-size: 0.9rem; margin-bottom: 4px;">
+                                                                                        <%= achievement.description %>
+                                                                                    </div>
+                                                                                </div>
+                                                                </div>
+                                                                <div style="display: flex; gap: 10px;">
+                                                                    <!-- Edit Button -->
+                                                                    <a href="/dashboard/edit-achievement/<%= achievement.id %>"
+                                                                        class="btn btn-secondary btn-sm"
+                                                                        style="background: white; border: 1px solid var(--slate-300);">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                    <form
+                                                                        action="/dashboard/delete-achievement/<%= achievement.id %>"
+                                                                        method="POST" style="margin: 0;">
+                                                                        <button type="submit"
+                                                                            class="btn btn-delete btn-sm"
+                                                                            onclick="return confirm('Delete this achievement?')">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <% }) %>
+                                                    </div>
+                                                    <% } else { %>
+                                                        <div
+                                                            style="text-align: center; padding: 20px; color: var(--slate-600); background: var(--slate-50); border-radius: var(--radius-md);">
+                                                            No achievements added yet.
+                                                        </div>
+                                                        <% } %>
+                                            </div>
+
+                                            <!-- Social Links -->
+                                            <div class="card" style="margin-top: 30px;">
+                                                <div class="section-header" style="margin-top: 0;">
+                                                    <h2>Social Links</h2>
+                                                </div>
+                                                <form action="/dashboard/save-socials" method="POST">
+                                                    <div
+                                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                                        <div class="form-group">
+                                                            <label class="form-label">Public Email</label>
+                                                            <input type="email" name="public_email" class="form-input"
+                                                                value="<%= profile?.public_email || '' %>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Phone</label>
+                                                            <input type="text" name="phone" class="form-input"
+                                                                value="<%= profile?.phone || '' %>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">LinkedIn</label>
+                                                            <input type="url" name="linkedin" class="form-input"
+                                                                value="<%= (typeof socialsMap !== 'undefined' ? socialsMap.linkedin : '') %>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">GitHub</label>
+                                                            <input type="url" name="github" class="form-input"
+                                                                value="<%= (typeof socialsMap !== 'undefined' ? socialsMap.github : '') %>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Twitter</label>
+                                                            <input type="url" name="twitter" class="form-input"
+                                                                value="<%= (typeof socialsMap !== 'undefined' ? socialsMap.twitter : '') %>">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">YouTube</label>
+                                                            <input type="url" name="youtube" class="form-input"
+                                                                value="<%= (typeof socialsMap !== 'undefined' ? socialsMap.youtube : '') %>">
+                                                        </div>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary"
+                                                        style="margin-top: 20px;">Save
+                                                        Links</button>
+                                                </form>
+                                            </div>
+
+                                        </div>
+                                    </div>
+        </div>
+
+        <script>
+            // COPY LINK FUNCTION
+            function copyLink() {
+                const url = window.location.origin + '/<%= user.username %>';
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Portfolio link copied to clipboard!');
+                });
+            }
+
+            function copyLinkInput() {
+                const copyText = document.getElementById("portfolio-link-input");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(copyText.value).then(() => {
+                    alert("Link copied: " + copyText.value);
+                });
+            }
+
+            // === 1. THEME SELECTION LOGIC ===
+            const currentTheme = "<%= profile?.theme_preference || 'static_minimalist' %>";
+
+            // Set active class initially
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                if (opt.dataset.theme === currentTheme) {
+                    opt.classList.add('active');
+                }
+            });
+
+            function selectTheme(themeName) {
+                // Remove active from all
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+
+                // Add active to selected
+                const selected = document.querySelector(`.theme-option[data-theme="${themeName}"]`);
+                if (selected) selected.classList.add('active');
+
+                // Update hidden input
+                document.getElementById('selected-theme').value = themeName;
+            }
+
+            // Show More / Less Logic
+            function toggleThemes() {
+                const moreThemes = document.getElementById('more-themes');
+                const btn = document.getElementById('show-more-btn');
+
+                if (moreThemes.style.display === 'none') {
+                    moreThemes.style.display = 'grid'; // Grid like the parent
+                    btn.innerHTML = 'Show Less <i class="fas fa-chevron-up"></i>';
+                } else {
+                    moreThemes.style.display = 'none';
+                    btn.innerHTML = 'Show More Themes <i class="fas fa-chevron-down"></i>';
+                }
+            }
+
+
+            // === 2. UNIFIED RESUME / AUTO-FILL LOGIC ===
+            function handleResumeSelect(input) {
+                if (input.files && input.files[0]) {
+                    // Show filename
+                    document.getElementById('resume-file-name').innerText = "Selected: " + input.files[0].name;
+                    // Show Auto-fill Button
+                    document.getElementById('ai-autofill-btn').style.display = 'block';
+                }
+            }
+
+            function triggerResumeParse() {
+                // Change form action to parse-resume and submit
+                const form = document.getElementById('profileForm');
+                const originalAction = form.action;
+
+                // We need to confirm if user wants to overwrite data
+                if (!confirm("This will upload your resume and use AI to auto-fill Projects, Achievements, and Qualifications. Continue?")) {
+                    return;
+                }
+
+                // Change action to the parse endpoint
+                // Note: The parse endpoint expects 'resume' file in the request.
+                // Our form has name="resume", so this works.
+                form.action = '/dashboard/api/parse-resume';
+                form.submit();
+
+                // Optional: Show loading state or block UI
+                document.body.style.opacity = '0.5';
+                document.body.style.pointerEvents = 'none';
+            }
+
+
+            // === 3. AI UPDATER LOGIC (Explicit Button) ===
+            async function upgradeText(inputId, statusId) {
+                const inputEl = document.getElementById(inputId);
+                const statusEl = document.getElementById(statusId);
+                const originalText = inputEl.value;
+
+                if (!originalText || originalText.length < 5) {
+                    alert("Please enter some text first.");
+                    return;
+                }
+
+                statusEl.style.display = 'inline-flex';
+
+                try {
+                    const response = await fetch('/dashboard/api/upgrade-text', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: originalText })
+                    });
+                    const data = await response.json();
+
+                    if (data.upgradedText) {
+                        const improvedText = data.upgradedText;
+
+                        // Check if buttons already exist, remove them
+                        let container = inputEl.parentNode;
+                        let existingControl = container.querySelector('.ai-controls');
+                        if (existingControl) existingControl.remove();
+
+                        // Set new text (preview)
+                        inputEl.value = improvedText;
+                        inputEl.style.background = "#eff6ff"; // light blue highlight check
+
+                        // Create Control Buttons
+                        const controls = document.createElement('div');
+                        controls.className = 'ai-controls';
+                        controls.style.marginTop = '10px';
+                        controls.style.display = 'flex';
+                        controls.style.gap = '10px';
+                        controls.innerHTML = `
+                            <button type="button" class="btn btn-success btn-sm" id="btn-accept">Accept</button>
+                            <button type="button" class="btn btn-delete btn-sm" id="btn-decline" style="background:var(--slate-200); color: var(--slate-700);">Decline</button>
+                        `;
+
+                        // Insert after textarea
+                        inputEl.insertAdjacentElement('afterend', controls);
+
+                        // Handlers
+                        controls.querySelector('#btn-accept').addEventListener('click', () => {
+                            inputEl.style.background = "white";
+                            controls.remove();
+                        });
+
+                        controls.querySelector('#btn-decline').addEventListener('click', () => {
+                            inputEl.value = originalText;
+                            inputEl.style.background = "white";
+                            controls.remove();
+                        });
+                    }
+                } catch (e) {
+                    console.error("AI Error", e);
+                    alert("Failed to connect to AI");
+                } finally {
+                    statusEl.style.display = 'none';
+                }
+            }
+
+
+            // === 4. SKILLS ADDER ===
+            function addSkill() {
+                const container = document.getElementById('skills-container');
+                const div = document.createElement('div');
+                div.className = 'skill-input-group';
+                div.style.display = 'flex';
+                div.style.gap = '5px';
+                div.innerHTML = `
+                    <input type="text" name="skills[]" class="form-input" style="width: 120px; padding: 6px;" placeholder="New Skill">
+                    <button type="button" class="btn btn-delete" onclick="this.parentElement.remove()" style="padding: 0 8px;">&times;</button>
+                `;
+                container.appendChild(div);
+            }
+        </script>
+</body>
+
+</html>

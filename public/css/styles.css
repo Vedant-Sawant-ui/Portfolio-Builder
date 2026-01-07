@@ -1,0 +1,290 @@
+/* =========================================
+   1. GLOBAL DEFAULTS (Base Variables)
+   ========================================= */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #007bff;
+  --secondary-color: #f8f9fa;
+  --accent-color: #0056b3;
+  --border-color: #dddddd;
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* =========================================
+   2. THEME DEFINITIONS (Matched to Dashboard.ejs)
+   ========================================= */
+
+/* --- GROUP 1: PREMIUM DYNAMIC THEMES (Base Colors) --- */
+
+/* 1. The Codeverse */
+body.theme-dynamic_codeverse {
+  --bg-color: #0b0c15;
+  --text-color: #a6accd;
+  --primary-color: #766df4; /* Galaxy Purple */
+  --secondary-color: #151621;
+  --accent-color: #ff79c6;
+  --border-color: #2a2c3d;
+}
+
+/* 2. Neural Nexus */
+body.theme-dynamic_neural {
+  --bg-color: #000000;
+  --text-color: #a553e8ff;
+  --primary-color: #00e5ff; /* Cyan Network */
+  --secondary-color: #102027;
+  --accent-color: #18ffff;
+  --border-color: #006064;
+}
+
+/* 3. Liquid Aura */
+body.theme-dynamic_liquid {
+  --bg-color: #ffffff;
+  --text-color: #2d3436;
+  --primary-color: #6c5ce7; /* Fluid Purple */
+  --secondary-color: #dfe6e9;
+  --accent-color: #a29bfe;
+  --border-color: #b2bec3;
+}
+
+/* 4. Cyber Grid */
+body.theme-dynamic_cybergrid {
+  --bg-color: #000b1e;
+  --text-color: #00ff9f; /* Neon Green */
+  --primary-color: #ff00ff; /* Magenta */
+  --secondary-color: #051a35;
+  --accent-color: #fcee0a; /* Yellow */
+  --border-color: #00ff9f;
+}
+
+/* 5. Terminal_OS */
+body.theme-dynamic_terminal {
+  --bg-color: #0d0d0d;
+  --text-color: #4af626; /* Hacker Green */
+  --primary-color: #4af626;
+  --secondary-color: #1a1a1a;
+  --accent-color: #28a745;
+  --border-color: #4af626;
+  --font-family: 'Courier New', Courier, monospace;
+}
+
+/* --- GROUP 2: PROFESSIONAL & CORPORATE --- */
+
+/* 6. Minimalist (Default) */
+body.theme-static_minimalist {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --primary-color: #000000;
+  --secondary-color: #f4f4f4;
+  --accent-color: #666666;
+  --border-color: #e5e5e5;
+}
+
+/* 7. Fortune 500 */
+body.theme-static_corporate_blue {
+  --bg-color: #0f172a;
+  --text-color: #cbd5e1;
+  --primary-color: #38bdf8;
+  --secondary-color: #1e293b;
+  --accent-color: #7dd3fc;
+  --border-color: #334155;
+}
+
+/* 8. Swiss Grid */
+body.theme-static_swiss {
+  --bg-color: #f5f5f5;
+  --text-color: #000000;
+  --primary-color: #ff3b30; /* International Red */
+  --secondary-color: #ffffff;
+  --accent-color: #000000;
+  --border-color: #000000;
+  --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* 9. The Consultant (Lawyer) */
+body.theme-static_lawyer {
+  --bg-color: #2b2b2b;
+  --text-color: #bfb608ff;
+  --primary-color: #c5a059; /* Gold/Beige */
+  --secondary-color: #383838;
+  --accent-color: #e0c078;
+  --border-color: #444444;
+}
+
+/* 10. Tech Startup */
+body.theme-static_tech_startup {
+  --bg-color: #ffffff;
+  --text-color: #425466;
+  --primary-color: #3f51b5; /* Intercom Blue */
+  --secondary-color: #f5f7f9;
+  --accent-color: #ff4081;
+  --border-color: #e6eaee;
+}
+
+/* --- GROUP 3: CREATIVE & PERSONAL --- */
+
+/* 11. Developer Dark */
+body.theme-static_dark_mode {
+  --bg-color: #1e1e1e;
+  --text-color: #d4d4d4;
+  --primary-color: #007acc; /* VS Code Blue */
+  --secondary-color: #252526;
+  --accent-color: #569cd6;
+  --border-color: #3e3e42;
+}
+
+/* 12. Deep Forest */
+body.theme-static_forest {
+  --bg-color: #1b2e1b;
+  --text-color: #e8f5e9;
+  --primary-color: #66bb6a;
+  --secondary-color: #2e4c2e;
+  --accent-color: #a5d6a7;
+  --border-color: #3e5e3e;
+}
+
+/* 13. Sunset */
+body.theme-static_sunset {
+  --bg-color: #2d1b2e;
+  --text-color: #ffd166;
+  --primary-color: #ef476f;
+  --secondary-color: #4a2b4a;
+  --accent-color: #118ab2;
+  --border-color: #ef476f;
+}
+
+/* 14. Monochrome */
+body.theme-static_monochrome {
+  --bg-color: #e0e0e0;
+  --text-color: #222222;
+  --primary-color: #555555;
+  --secondary-color: #cccccc;
+  --accent-color: #000000;
+  --border-color: #999999;
+}
+
+/* 15. Soft Pastel */
+body.theme-static_pastel {
+  --bg-color: #fff0f5; /* Lavender Blush */
+  --text-color: #5c5c5c;
+  --primary-color: #ffb7b2; /* Pastel Red */
+  --secondary-color: #e2f0cb; /* Pastel Green */
+  --accent-color: #ff9aa2;
+  --border-color: #ffdac1;
+}
+
+/* --- GROUP 4: BOLD & DISTINCT --- */
+
+/* 16. Brutalist */
+body.theme-static_brutalist {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --primary-color: #ff0055; /* Hot Pink */
+  --secondary-color: #ffffff;
+  --accent-color: #0000ff;
+  --border-color: #000000;
+  --font-family: 'Arial Black', sans-serif;
+}
+
+/* 17. Retro 90s */
+body.theme-static_retro {
+  --bg-color: #c0c0c0; /* Windows 95 Grey */
+  --text-color: #000000;
+  --primary-color: #000080; /* Navy Blue */
+  --secondary-color: #dfdfdf;
+  --accent-color: #808080;
+  --border-color: #808080; /* Beveled look usually */
+}
+
+/* 18. The Resume (Paper) */
+body.theme-static_paper {
+  --bg-color: #fdfbf7; /* Parchment */
+  --text-color: #3d3b38;
+  --primary-color: #8b5e3c; /* Brown ink */
+  --secondary-color: #f4f1ea;
+  --accent-color: #a67c52;
+  --border-color: #dcd6cc;
+  --font-family: 'Georgia', serif;
+}
+
+/* 19. Glassmorphism */
+body.theme-static_glass {
+  --bg-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* needs override in master */
+  --text-color: #87c8e9ff;
+  --primary-color: rgba(255, 255, 255, 0.4);
+  --secondary-color: rgba(255, 255, 255, 0.1);
+  --accent-color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 20. Editorial (Print) */
+body.theme-static_print {
+  --bg-color: #ffffff;
+  --text-color: #1a1a1a;
+  --primary-color: #1a1a1a;
+  --secondary-color: #f2f2f2;
+  --accent-color: #cc0000; /* Newspaper Highlight */
+  --border-color: #1a1a1a;
+  --font-family: 'Times New Roman', Times, serif;
+}
+
+
+/* =========================================
+   3. GLOBAL COMPONENT STYLES (Consuming Variables)
+   ========================================= */
+
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  transition: background 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
+}
+
+/* Card / Container Styling */
+.card, .container, .sidebar, .achievement-entry, .project-card {
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Button Styling */
+button, .btn, .btn-primary {
+  background-color: var(--primary-color);
+  color: var(--bg-color); /* Contrast text */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Special case for 'light' text on dark buttons if bg is light */
+body.theme-static_minimalist .btn, 
+body.theme-static_swiss .btn,
+body.theme-static_tech_startup .btn,
+body.theme-static_brutalist .btn,
+body.theme-static_paper .btn,
+body.theme-static_print .btn {
+    color: #fff; /* Ensure text is readable on colored buttons */
+}
+
+/* Links */
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Inputs */
+input, textarea, select {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 4px;
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Qualification - Portfolio Builder</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .ai-status {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-left: auto;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <div class="container" style="max-width: 700px;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📜 Add Qualification</h2>
+                    <p class="card-subtitle">Add certifications, internships, or education.</p>
+                </div>
+
+                <form action="/dashboard/add-qualification" method="POST" enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select name="type" class="form-select">
+                            <option value="Certification">Certification</option>
+                            <option value="Internship">Internship</option>
+                            <option value="License">License</option>
+                            <option value="Education">Education / Degree</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-input"
+                            placeholder="e.g. AWS Certified Cloud Practitioner" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Organization / Institution</label>
+                        <input type="text" name="organization" class="form-input"
+                            placeholder="e.g. Amazon Web Services">
+                    </div>
+
+                    <div class="form-group">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label class="form-label" style="margin-bottom: 0;">Description</label>
+                            <span id="qual-ai-status" class="ai-status"><i class="fas fa-spinner fa-spin"></i> Improving
+                                Grammar...</span>
+                        </div>
+                        <textarea id="qual-desc" name="description" class="form-textarea" rows="3"
+                            placeholder="Brief details... (Auto-improves on stop)"></textarea>
+                    </div>
+
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-input">
+                        </div>
+                        <div>
+                            <label class="form-label">End Date <span
+                                    style="font-weight: normal; color: var(--slate-600);">(Optional)</span></label>
+                            <input type="date" name="end_date" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Credential Link (URL)</label>
+                        <input type="url" name="link_url" class="form-input" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Upload Certificate/Document</label>
+                        <input type="file" name="qual_file" accept=".pdf,image/*" class="form-input"
+                            style="padding: 6px;">
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">Save Qualification</button>
+                        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            // AI Auto-Trigger Logic
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), wait);
+                };
+            }
+
+            const qualInput = document.getElementById('qual-desc');
+            const qualStatus = document.getElementById('qual-ai-status');
+
+            const improveQual = async () => {
+                const text = qualInput.value;
+                if (!text || text.length < 5) return;
+
+                qualStatus.style.display = 'flex';
+                
+                try {
+                    const response = await fetch('/dashboard/api/upgrade-text', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: text })
+                    });
+                    const data = await response.json();
+                    
+                    if(data.upgradedText && data.upgradedText !== text) {
+                        qualInput.value = data.upgradedText;
+                        qualInput.style.backgroundColor = "#f0fdfa";
+                        setTimeout(() => qualInput.style.backgroundColor = "white", 1000);
+                    }
+                } catch (err) {
+                    console.error("AI Error", err);
+                } finally {
+                    qualStatus.style.display = 'none';
+                }
+            };
+
+            qualInput.addEventListener('input', debounce(improveQual, 2000));
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Achievement - Portfolio Builder</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <div class="container" style="max-width: 700px;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🏆 Edit Achievement</h2>
+                </div>
+
+                <form action="/dashboard/edit-achievement/<%= achievement.id %>" method="POST"
+                    enctype="multipart/form-data">
+
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" name="title" class="form-input" value="<%= achievement.title %>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-textarea"
+                            rows="4"><%= achievement.description %></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <!-- Format date to YYYY-MM-DD for input -->
+                        <% let dateStr='' ; if(achievement.achievement_date) { const d=new
+                            Date(achievement.achievement_date); dateStr=d.toISOString().split('T')[0]; } %>
+                            <input type="date" name="achievement_date" class="form-input" value="<%= dateStr %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Image</label>
+                        <% if (achievement.image_url) { %>
+                            <div style="margin-bottom: 10px;">
+                                <p style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 5px;">Current
+                                    Image:</p>
+                                <img src="<%= achievement.image_url %>"
+                                    style="height: 100px; border-radius: 8px; border: 1px solid var(--slate-200);">
+                            </div>
+                            <% } %>
+                                <input type="file" name="achievement_image" accept="image/*" class="form-input">
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">Update Achievement</button>
+                        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+</body>
+
+</html>
