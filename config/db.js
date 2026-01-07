@@ -2,13 +2,17 @@ require('dotenv').config(); // Load environment variables from .env file
 const { Pool } = require('pg');
 
 // Create a new pool instance using values from .env
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-});
+const pool = new Pool(
+    process.env.DATABASE_URL 
+    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+    : {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+      }
+);
 
 // Optional: Log when connected successfully (helps debugging)
 pool.on('connect', () => {
