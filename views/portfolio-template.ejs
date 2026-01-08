@@ -73,409 +73,412 @@
                                                     <% } %>
                                 </header>
 
-                                const getSkillSlug=(name)=> {
-                                if(!name) return 'code';
-                                let lower = name.toLowerCase().trim();
-                                const slugMap = { 'c++': 'cpp', 'cpp': 'cpp', 'c#': 'cs', 'csharp': 'cs', 'html':
-                                'html', 'html5': 'html', 'css': 'css', 'css3': 'css', 'javascript': 'js', 'js':
-                                'js', 'python': 'py', 'py': 'py', 'java': 'java', 'react': 'react', 'react.js':
-                                'react', 'reactjs': 'react', 'node': 'nodejs', 'node.js': 'nodejs', 'nodejs':
-                                'nodejs', 'vue': 'vue', 'vue.js': 'vue', 'vuejs': 'vue', 'angular': 'angular',
-                                'angular.js': 'angular', 'express': 'express', 'express.js': 'express', 'next':
-                                'nextjs', 'next.js': 'nextjs', 'mongo': 'mongodb', 'mongodb': 'mongodb', 'sql':
-                                'mysql', 'mysql': 'mysql', 'postgres': 'postgres', 'postgresql': 'postgres', 'aws':
-                                'aws', 'gcp': 'gcp', 'azure': 'azure', 'docker': 'docker', 'kubernetes':
-                                'kubernetes', 'k8s': 'kubernetes', 'git': 'git', 'linux': 'linux', 'tailwind':
-                                'tailwindcss', 'tailwind css': 'tailwindcss', 'bootstrap': 'bootstrap', 'sass':
-                                'sass', 'figma': 'figma' };
-                                return slugMap[lower] || lower.replace(/\s+/g, '').replace(/\./g, '');
-                                };
-                                %>
+                                <% const getSkillSlug=(name)=> {
+                                    if(!name) return 'code';
+                                    let lower = name.toLowerCase().trim();
+                                    const slugMap = { 'c++': 'cpp', 'cpp': 'cpp', 'c#': 'cs', 'csharp': 'cs', 'html':
+                                    'html', 'html5': 'html', 'css': 'css', 'css3': 'css', 'javascript': 'js', 'js':
+                                    'js', 'python': 'py', 'py': 'py', 'java': 'java', 'react': 'react', 'react.js':
+                                    'react', 'reactjs': 'react', 'node': 'nodejs', 'node.js': 'nodejs', 'nodejs':
+                                    'nodejs', 'vue': 'vue', 'vue.js': 'vue', 'vuejs': 'vue', 'angular': 'angular',
+                                    'angular.js': 'angular', 'express': 'express', 'express.js': 'express', 'next':
+                                    'nextjs', 'next.js': 'nextjs', 'mongo': 'mongodb', 'mongodb': 'mongodb', 'sql':
+                                    'mysql', 'mysql': 'mysql', 'postgres': 'postgres', 'postgresql': 'postgres', 'aws':
+                                    'aws', 'gcp': 'gcp', 'azure': 'azure', 'docker': 'docker', 'kubernetes':
+                                    'kubernetes', 'k8s': 'kubernetes', 'git': 'git', 'linux': 'linux', 'tailwind':
+                                    'tailwindcss', 'tailwind css': 'tailwindcss', 'bootstrap': 'bootstrap', 'sass':
+                                    'sass', 'figma': 'figma' };
+                                    return slugMap[lower] || lower.replace(/\s+/g, '').replace(/\./g, '');
+                                    };
+                                    %>
 
-                                <!-- 2. SKILLS -->
-                                <section class="skills-section">
-                                    <h2>Technical Skills</h2>
-                                    <div class="skills-grid">
-                                        <% if (typeof skills !=='undefined' && skills.length> 0) { %>
-                                            <% skills.forEach(skill=> { %>
-                                                <div class="skill-pill">
-                                                    <img src="https://skillicons.dev/icons?i=<%= getSkillSlug(skill.skill_name) %>"
-                                                        alt="<%= skill.skill_name %>" class="skill-icon-img"
-                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                                                    <span class="skill-fallback" style="display:none;">Code</span>
-                                                    <span class="skill-name">
-                                                        <%= skill.skill_name %>
-                                                    </span>
-                                                </div>
-                                                <% }) %>
-                                                    <% } else { %>
-                                                        <p>No skills listed yet.</p>
-                                                        <% } %>
-                                    </div>
-                                </section>
-
-                                <!-- 3. PROJECTS (Moved Up) -->
-                                <section class="projects-section">
-                                    <h2>Projects</h2>
-                                    <div class="projects-grid">
-                                        <% projects.forEach(project=> { %>
-                                            <div class="card project-card">
-                                                <% if (project.thumbnail_url) { %>
-                                                    <img src="<%= project.thumbnail_url %>" alt="Project Thumb"
-                                                        class="card-img">
-                                                    <% } %>
-                                                        <div class="card-content">
-                                                            <h3>
-                                                                <%= project.title %>
-                                                            </h3>
-                                                            <p>
-                                                                <%= project.description %>
-                                                            </p>
-                                                            <% if(project.project_link) { %>
-                                                                <a href="<%= project.project_link %>" target="_blank"
-                                                                    class="btn btn-secondary">View
-                                                                    Code</a>
-                                                                <% } %>
-                                                        </div>
-                                            </div>
-                                            <% }) %>
-                                    </div>
-                                </section>
-
-                                <!-- 4. QUALIFICATIONS (Moved Down) -->
-                                <% if (typeof qualifications !=='undefined' && qualifications.length> 0) { %>
-                                    <section class="qualifications-section"
-                                        style="margin-top: 40px; margin-bottom: 40px;">
-                                        <h2>Experience & Qualifications</h2>
-                                        <div class="qual-grid">
-                                            <% qualifications.forEach(qual=> { %>
-                                                <div class="qual-card">
-                                                    <div class="qual-header">
-                                                        <span class="qual-type">
-                                                            <%= qual.type %>
+                                    <!-- 2. SKILLS -->
+                                    <section class="skills-section">
+                                        <h2>Technical Skills</h2>
+                                        <div class="skills-grid">
+                                            <% if (typeof skills !=='undefined' && skills.length> 0) { %>
+                                                <% skills.forEach(skill=> { %>
+                                                    <div class="skill-pill">
+                                                        <img src="https://skillicons.dev/icons?i=<%= getSkillSlug(skill.skill_name) %>"
+                                                            alt="<%= skill.skill_name %>" class="skill-icon-img"
+                                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                                                        <span class="skill-fallback" style="display:none;">Code</span>
+                                                        <span class="skill-name">
+                                                            <%= skill.skill_name %>
                                                         </span>
-                                                        <% if (qual.start_date) { %>
-                                                            <span class="qual-date">
-                                                                <%= new Date(qual.start_date).getFullYear() %>
-                                                                    <% if (qual.end_date) { %> - <%= new
-                                                                            Date(qual.end_date).getFullYear() %>
-                                                                            <% } %>
-                                                            </span>
-                                                            <% } %>
                                                     </div>
-                                                    <h3>
-                                                        <%= qual.title %>
-                                                    </h3>
-                                                    <p class="qual-org"><i class="fas fa-building"
-                                                            style="margin-right: 5px;"></i>
-                                                        <%= qual.organization %>
-                                                    </p>
-                                                    <% if (qual.description) { %>
-                                                        <p class="qual-desc">
-                                                            <%= qual.description %>
-                                                        </p>
+                                                    <% }) %>
+                                                        <% } else { %>
+                                                            <p>No skills listed yet.</p>
+                                                            <% } %>
+                                        </div>
+                                    </section>
+
+                                    <!-- 3. PROJECTS (Moved Up) -->
+                                    <section class="projects-section">
+                                        <h2>Projects</h2>
+                                        <div class="projects-grid">
+                                            <% projects.forEach(project=> { %>
+                                                <div class="card project-card">
+                                                    <% if (project.thumbnail_url) { %>
+                                                        <img src="<%= project.thumbnail_url %>" alt="Project Thumb"
+                                                            class="card-img">
                                                         <% } %>
-                                                            <div class="qual-links">
-                                                                <% if (qual.link_url) { %>
-                                                                    <a href="<%= qual.link_url %>" target="_blank"
-                                                                        class="qual-btn"><i class="fas fa-link"></i>
-                                                                        Verify</a>
+                                                            <div class="card-content">
+                                                                <h3>
+                                                                    <%= project.title %>
+                                                                </h3>
+                                                                <p>
+                                                                    <%= project.description %>
+                                                                </p>
+                                                                <% if(project.project_link) { %>
+                                                                    <a href="<%= project.project_link %>"
+                                                                        target="_blank" class="btn btn-secondary">View
+                                                                        Code</a>
                                                                     <% } %>
-                                                                        <% if (qual.file_url) { %>
-                                                                            <a href="<%= qual.file_url %>"
-                                                                                target="_blank"
-                                                                                class="qual-btn outline"><i
-                                                                                    class="fas fa-file-pdf"></i>
-                                                                                View Doc</a>
-                                                                            <% } %>
                                                             </div>
                                                 </div>
                                                 <% }) %>
                                         </div>
                                     </section>
-                                    <style>
-                                        /* Qualifications CSS (Inlined for simplicity in template) */
-                                        .qual-grid {
-                                            display: grid;
-                                            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                                            gap: 20px;
-                                        }
 
-                                        .qual-card {
-                                            background: rgba(255, 255, 255, 0.05);
-                                            border: 1px solid rgba(0, 0, 0, 0.1);
-                                            padding: 20px;
-                                            border-radius: 10px;
-                                            transition: transform 0.2s;
-                                            position: relative;
-                                            overflow: hidden;
-                                        }
-
-                                        .theme-dynamic_codeverse .qual-card,
-                                        .theme-dynamic_neural .qual-card {
-                                            background: rgba(255, 255, 255, 0.1);
-                                            border: 1px solid rgba(255, 255, 255, 0.2);
-                                            color: white;
-                                        }
-
-                                        .qual-card:hover {
-                                            transform: translateY(-5px);
-                                        }
-
-                                        .qual-header {
-                                            display: flex;
-                                            justify-content: space-between;
-                                            font-size: 0.85em;
-                                            margin-bottom: 10px;
-                                            opacity: 0.7;
-                                            text-transform: uppercase;
-                                            letter-spacing: 0.5px;
-                                        }
-
-                                        .qual-type {
-                                            background: rgba(0, 123, 255, 0.1);
-                                            color: #007bff;
-                                            padding: 2px 8px;
-                                            border-radius: 4px;
-                                            font-weight: bold;
-                                        }
-
-                                        [class*="theme-dynamic"] .qual-type {
-                                            background: rgba(64, 224, 208, 0.2);
-                                            color: #40e0d0;
-                                        }
-
-                                        .qual-card h3 {
-                                            margin: 0 0 5px 0;
-                                            font-size: 1.2rem;
-                                        }
-
-                                        .qual-org {
-                                            font-weight: 500;
-                                            margin-bottom: 10px;
-                                            opacity: 0.8;
-                                        }
-
-                                        .qual-desc {
-                                            font-size: 0.95em;
-                                            line-height: 1.5;
-                                            margin-bottom: 15px;
-                                            opacity: 0.8;
-                                        }
-
-                                        .qual-links {
-                                            display: flex;
-                                            gap: 10px;
-                                            margin-top: auto;
-                                        }
-
-                                        .qual-btn {
-                                            text-decoration: none;
-                                            font-size: 0.9em;
-                                            padding: 6px 12px;
-                                            border-radius: 4px;
-                                            background: #007bff;
-                                            color: white;
-                                            transition: background 0.2s;
-                                        }
-
-                                        .qual-btn:hover {
-                                            background: #0056b3;
-                                        }
-
-                                        .qual-btn.outline {
-                                            background: transparent;
-                                            border: 1px solid #007bff;
-                                            color: #007bff;
-                                        }
-
-                                        .qual-btn.outline:hover {
-                                            background: rgba(0, 123, 255, 0.1);
-                                        }
-
-                                        [class*="theme-dynamic"] .qual-btn.outline {
-                                            border-color: #fff;
-                                            color: #fff;
-                                        }
-
-                                        .skill-pill {
-                                            display: flex;
-                                            flex-direction: column;
-                                            align-items: center;
-                                            gap: 10px;
-                                            background: rgba(255, 255, 255, 0.05);
-                                            padding: 15px;
-                                            border-radius: 12px;
-                                            transition: transform 0.3s ease;
-                                            min-width: 100px;
-                                        }
-
-                                        .skill-pill:hover {
-                                            transform: translateY(-5px);
-                                            background: rgba(255, 255, 255, 0.1);
-                                            padding: 15px;
-                                        }
-
-                                        .skill-icon-img {
-                                            width: 48px;
-                                            height: 48px;
-                                            object-fit: contain;
-                                            border-radius: 5px;
-                                        }
-
-                                        .theme-dynamic_codeverse .skill-pill,
-                                        .theme-dynamic_neural .skill-pill {
-                                            border: 1px solid rgba(255, 255, 255, 0.1);
-                                        }
-                                    </style>
-                                    <% } %>
-
-                                        <!-- 5. GITHUB & LEETCODE -->
-                                        <% if (user.leetcode_username) { %>
-                                            <section class="leetcode-section">
-                                                <% const isDark=theme.includes('dark') || theme.includes('dynamic') ||
-                                                    theme.includes('corporate'); %>
-                                                    <img src="https://leetcard.jacoblin.cool/<%= user.leetcode_username %>?theme=<%= isDark ? 'dark' : 'light' %>&font=Segoe%20UI&ext=heatmap"
-                                                        alt="LeetCode Stats"
-                                                        style="width: 100%; max-width: 400px; border-radius: 8px;">
-                                            </section>
-                                            <% } %>
-
-                                                <% if (user.github_username) { %>
-                                                    <section class="github-section" style="margin-top: 20px;">
-                                                        <% const isDarkGit=theme.includes('dark') ||
-                                                            theme.includes('dynamic') || theme.includes('corporate');
-                                                            const gitTheme=isDarkGit ? 'radical' : 'default' ; %>
-                                                            <h2 style="margin-bottom: 15px;">GitHub Activity</h2>
-                                                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                                                <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=<%= user.github_username %>&layout=compact&theme=<%= gitTheme %>&hide_border=true"
-                                                                    alt="Top Languages" style="height: 165px;"
-                                                                    onerror="this.style.display='none'; document.getElementById('gh-fallback').style.display='block'">
-                                                                <img src="https://github-readme-stats.vercel.app/api?username=<%= user.github_username %>&show_icons=true&theme=<%= gitTheme %>&hide_border=true"
-                                                                    alt="GitHub Stats" style="height: 165px;"
-                                                                    onerror="this.style.display='none'; document.getElementById('gh-fallback').style.display='block'">
-                                                                <img src="https://github-readme-streak-stats.herokuapp.com/?user=<%= user.github_username %>&theme=<%= gitTheme %>&hide_border=true"
-                                                                    alt="GitHub Streak" style="height: 165px;"
-                                                                    onerror="this.style.display='none'; document.getElementById('gh-fallback').style.display='block'">
-                                                                <div id="gh-fallback"
-                                                                    style="display:none; width: 100%; text-align: center; margin-top: 10px;">
-                                                                    <a href="https://github.com/<%= user.github_username %>"
-                                                                        target="_blank" class="btn btn-secondary"><i
-                                                                            class="fab fa-github"></i> View My
-                                                                        GitHub Profile</a>
-                                                                </div>
-                                                            </div>
-                                                    </section>
-                                                    <% } %>
-
-                                                        <!-- 6. ACHIEVEMENTS -->
-                                                        <% if (typeof achievements !=='undefined' &&
-                                                            achievements.length> 0) { %>
-                                                            <section class="achievements-section">
-                                                                <h2>Achievements & Awards</h2>
-                                                                <div class="achievements-list">
-                                                                    <% achievements.forEach(ach=> { %>
-                                                                        <div class="achievement-item">
-                                                                            <% if (ach.image_url) { %>
-                                                                                <img src="<%= ach.image_url %>"
-                                                                                    alt="Achievement"
-                                                                                    class="achievement-img">
-                                                                                <% } else { %>
-                                                                                    <div class="achievement-icon">🏆
-                                                                                    </div>
-                                                                                    <% } %>
-                                                                                        <div
-                                                                                            class="achievement-content">
-                                                                                            <h3>
-                                                                                                <%= ach.title %>
-                                                                                            </h3>
-                                                                                            <% if (ach.description) { %>
-                                                                                                <p>
-                                                                                                    <%= ach.description
-                                                                                                        %>
-                                                                                                </p>
-                                                                                                <% } %>
-                                                                                                    <% if
-                                                                                                        (ach.achievement_date)
-                                                                                                        { %>
-                                                                                                        <span
-                                                                                                            class="achievement-date">
-                                                                                                            <%= new
-                                                                                                                Date(ach.achievement_date).toLocaleDateString('en-US',
-                                                                                                                {
-                                                                                                                month: 'short'
-                                                                                                                ,
-                                                                                                                year: 'numeric'
-                                                                                                                }) %>
-                                                                                                        </span>
-                                                                                                        <% } %>
-                                                                                        </div>
-                                                                        </div>
-                                                                        <% }) %>
-                                                                </div>
-                                                                <style>
-                                                                    .project-card .card-img {
-                                                                        width: 100%;
-                                                                        height: 200px;
-                                                                        object-fit: cover;
-                                                                        border-top-left-radius: 8px;
-                                                                        border-top-right-radius: 8px;
-                                                                    }
-
-                                                                    .achievement-img {
-                                                                        width: 120px;
-                                                                        height: 120px;
-                                                                        object-fit: cover;
-                                                                        border-radius: 8px;
-                                                                        flex-shrink: 0;
-                                                                        border: 1px solid rgba(255, 255, 255, 0.1);
-                                                                    }
-
-                                                                    .achievements-list {
-                                                                        display: flex;
-                                                                        flex-direction: column;
-                                                                        gap: 15px;
-                                                                        margin-top: 20px;
-                                                                    }
-
-                                                                    .achievement-item {
-                                                                        display: flex;
-                                                                        align-items: flex-start;
-                                                                        gap: 15px;
-                                                                        background: rgba(255, 255, 255, 0.05);
-                                                                        padding: 15px;
-                                                                        border-radius: 8px;
-                                                                        border: 1px solid rgba(0, 0, 0, 0.1);
-                                                                    }
-
-                                                                    .achievement-icon {
-                                                                        font-size: 1.5rem;
-                                                                    }
-
-                                                                    .achievement-content h3 {
-                                                                        margin: 0 0 5px 0;
-                                                                        font-size: 1.1rem;
-                                                                    }
-
-                                                                    .achievement-content p {
-                                                                        margin: 0 0 5px 0;
-                                                                        font-size: 0.95rem;
-                                                                        opacity: 0.8;
-                                                                    }
-
-                                                                    .achievement-date {
-                                                                        font-size: 0.85rem;
-                                                                        opacity: 0.6;
-                                                                    }
-
-                                                                    .theme-dynamic_codeverse .achievement-item,
-                                                                    .theme-dynamic_neural .achievement-item {
-                                                                        background: rgba(255, 255, 255, 0.1);
-                                                                        border: 1px solid rgba(255, 255, 255, 0.2);
-                                                                    }
-                                                                </style>
-                                                            </section>
+                                    <!-- 4. QUALIFICATIONS (Moved Down) -->
+                                    <% if (typeof qualifications !=='undefined' && qualifications.length> 0) { %>
+                                        <section class="qualifications-section"
+                                            style="margin-top: 40px; margin-bottom: 40px;">
+                                            <h2>Experience & Qualifications</h2>
+                                            <div class="qual-grid">
+                                                <% qualifications.forEach(qual=> { %>
+                                                    <div class="qual-card">
+                                                        <div class="qual-header">
+                                                            <span class="qual-type">
+                                                                <%= qual.type %>
+                                                            </span>
+                                                            <% if (qual.start_date) { %>
+                                                                <span class="qual-date">
+                                                                    <%= new Date(qual.start_date).getFullYear() %>
+                                                                        <% if (qual.end_date) { %> - <%= new
+                                                                                Date(qual.end_date).getFullYear() %>
+                                                                                <% } %>
+                                                                </span>
+                                                                <% } %>
+                                                        </div>
+                                                        <h3>
+                                                            <%= qual.title %>
+                                                        </h3>
+                                                        <p class="qual-org"><i class="fas fa-building"
+                                                                style="margin-right: 5px;"></i>
+                                                            <%= qual.organization %>
+                                                        </p>
+                                                        <% if (qual.description) { %>
+                                                            <p class="qual-desc">
+                                                                <%= qual.description %>
+                                                            </p>
                                                             <% } %>
+                                                                <div class="qual-links">
+                                                                    <% if (qual.link_url) { %>
+                                                                        <a href="<%= qual.link_url %>" target="_blank"
+                                                                            class="qual-btn"><i class="fas fa-link"></i>
+                                                                            Verify</a>
+                                                                        <% } %>
+                                                                            <% if (qual.file_url) { %>
+                                                                                <a href="<%= qual.file_url %>"
+                                                                                    target="_blank"
+                                                                                    class="qual-btn outline"><i
+                                                                                        class="fas fa-file-pdf"></i>
+                                                                                    View Doc</a>
+                                                                                <% } %>
+                                                                </div>
+                                                    </div>
+                                                    <% }) %>
+                                            </div>
+                                        </section>
+                                        <style>
+                                            /* Qualifications CSS (Inlined for simplicity in template) */
+                                            .qual-grid {
+                                                display: grid;
+                                                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                                                gap: 20px;
+                                            }
+
+                                            .qual-card {
+                                                background: rgba(255, 255, 255, 0.05);
+                                                border: 1px solid rgba(0, 0, 0, 0.1);
+                                                padding: 20px;
+                                                border-radius: 10px;
+                                                transition: transform 0.2s;
+                                                position: relative;
+                                                overflow: hidden;
+                                            }
+
+                                            .theme-dynamic_codeverse .qual-card,
+                                            .theme-dynamic_neural .qual-card {
+                                                background: rgba(255, 255, 255, 0.1);
+                                                border: 1px solid rgba(255, 255, 255, 0.2);
+                                                color: white;
+                                            }
+
+                                            .qual-card:hover {
+                                                transform: translateY(-5px);
+                                            }
+
+                                            .qual-header {
+                                                display: flex;
+                                                justify-content: space-between;
+                                                font-size: 0.85em;
+                                                margin-bottom: 10px;
+                                                opacity: 0.7;
+                                                text-transform: uppercase;
+                                                letter-spacing: 0.5px;
+                                            }
+
+                                            .qual-type {
+                                                background: rgba(0, 123, 255, 0.1);
+                                                color: #007bff;
+                                                padding: 2px 8px;
+                                                border-radius: 4px;
+                                                font-weight: bold;
+                                            }
+
+                                            [class*="theme-dynamic"] .qual-type {
+                                                background: rgba(64, 224, 208, 0.2);
+                                                color: #40e0d0;
+                                            }
+
+                                            .qual-card h3 {
+                                                margin: 0 0 5px 0;
+                                                font-size: 1.2rem;
+                                            }
+
+                                            .qual-org {
+                                                font-weight: 500;
+                                                margin-bottom: 10px;
+                                                opacity: 0.8;
+                                            }
+
+                                            .qual-desc {
+                                                font-size: 0.95em;
+                                                line-height: 1.5;
+                                                margin-bottom: 15px;
+                                                opacity: 0.8;
+                                            }
+
+                                            .qual-links {
+                                                display: flex;
+                                                gap: 10px;
+                                                margin-top: auto;
+                                            }
+
+                                            .qual-btn {
+                                                text-decoration: none;
+                                                font-size: 0.9em;
+                                                padding: 6px 12px;
+                                                border-radius: 4px;
+                                                background: #007bff;
+                                                color: white;
+                                                transition: background 0.2s;
+                                            }
+
+                                            .qual-btn:hover {
+                                                background: #0056b3;
+                                            }
+
+                                            .qual-btn.outline {
+                                                background: transparent;
+                                                border: 1px solid #007bff;
+                                                color: #007bff;
+                                            }
+
+                                            .qual-btn.outline:hover {
+                                                background: rgba(0, 123, 255, 0.1);
+                                            }
+
+                                            [class*="theme-dynamic"] .qual-btn.outline {
+                                                border-color: #fff;
+                                                color: #fff;
+                                            }
+
+                                            .skill-pill {
+                                                display: flex;
+                                                flex-direction: column;
+                                                align-items: center;
+                                                gap: 10px;
+                                                background: rgba(255, 255, 255, 0.05);
+                                                padding: 15px;
+                                                border-radius: 12px;
+                                                transition: transform 0.3s ease;
+                                                min-width: 100px;
+                                            }
+
+                                            .skill-pill:hover {
+                                                transform: translateY(-5px);
+                                                background: rgba(255, 255, 255, 0.1);
+                                                padding: 15px;
+                                            }
+
+                                            .skill-icon-img {
+                                                width: 48px;
+                                                height: 48px;
+                                                object-fit: contain;
+                                                border-radius: 5px;
+                                            }
+
+                                            .theme-dynamic_codeverse .skill-pill,
+                                            .theme-dynamic_neural .skill-pill {
+                                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                            }
+                                        </style>
+                                        <% } %>
+
+                                            <!-- 5. GITHUB & LEETCODE -->
+                                            <% if (user.leetcode_username) { %>
+                                                <section class="leetcode-section">
+                                                    <% const isDark=theme.includes('dark') || theme.includes('dynamic')
+                                                        || theme.includes('corporate'); %>
+                                                        <img src="https://leetcard.jacoblin.cool/<%= user.leetcode_username %>?theme=<%= isDark ? 'dark' : 'light' %>&font=Segoe%20UI&ext=heatmap"
+                                                            alt="LeetCode Stats"
+                                                            style="width: 100%; max-width: 400px; border-radius: 8px;">
+                                                </section>
+                                                <% } %>
+
+                                                    <% if (user.github_username) { %>
+                                                        <section class="github-section" style="margin-top: 20px;">
+                                                            <% const isDarkGit=theme.includes('dark') ||
+                                                                theme.includes('dynamic') ||
+                                                                theme.includes('corporate'); const gitTheme=isDarkGit
+                                                                ? 'radical' : 'default' ; %>
+                                                                <h2 style="margin-bottom: 15px;">GitHub Activity</h2>
+                                                                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                                    <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=<%= user.github_username %>&layout=compact&theme=<%= gitTheme %>&hide_border=true"
+                                                                        alt="Top Languages" style="height: 165px;"
+                                                                        onerror="this.style.display='none'; document.getElementById('gh-fallback').style.display='block'">
+                                                                    <img src="https://github-readme-stats.vercel.app/api?username=<%= user.github_username %>&show_icons=true&theme=<%= gitTheme %>&hide_border=true"
+                                                                        alt="GitHub Stats" style="height: 165px;"
+                                                                        onerror="this.style.display='none'; document.getElementById('gh-fallback').style.display='block'">
+                                                                    <img src="https://github-readme-streak-stats.herokuapp.com/?user=<%= user.github_username %>&theme=<%= gitTheme %>&hide_border=true"
+                                                                        alt="GitHub Streak" style="height: 165px;"
+                                                                        onerror="this.style.display='none'; document.getElementById('gh-fallback').style.display='block'">
+                                                                    <div id="gh-fallback"
+                                                                        style="display:none; width: 100%; text-align: center; margin-top: 10px;">
+                                                                        <a href="https://github.com/<%= user.github_username %>"
+                                                                            target="_blank" class="btn btn-secondary"><i
+                                                                                class="fab fa-github"></i> View My
+                                                                            GitHub Profile</a>
+                                                                    </div>
+                                                                </div>
+                                                        </section>
+                                                        <% } %>
+
+                                                            <!-- 6. ACHIEVEMENTS -->
+                                                            <% if (typeof achievements !=='undefined' &&
+                                                                achievements.length> 0) { %>
+                                                                <section class="achievements-section">
+                                                                    <h2>Achievements & Awards</h2>
+                                                                    <div class="achievements-list">
+                                                                        <% achievements.forEach(ach=> { %>
+                                                                            <div class="achievement-item">
+                                                                                <% if (ach.image_url) { %>
+                                                                                    <img src="<%= ach.image_url %>"
+                                                                                        alt="Achievement"
+                                                                                        class="achievement-img">
+                                                                                    <% } else { %>
+                                                                                        <div class="achievement-icon">🏆
+                                                                                        </div>
+                                                                                        <% } %>
+                                                                                            <div
+                                                                                                class="achievement-content">
+                                                                                                <h3>
+                                                                                                    <%= ach.title %>
+                                                                                                </h3>
+                                                                                                <% if (ach.description)
+                                                                                                    { %>
+                                                                                                    <p>
+                                                                                                        <%= ach.description
+                                                                                                            %>
+                                                                                                    </p>
+                                                                                                    <% } %>
+                                                                                                        <% if
+                                                                                                            (ach.achievement_date)
+                                                                                                            { %>
+                                                                                                            <span
+                                                                                                                class="achievement-date">
+                                                                                                                <%= new
+                                                                                                                    Date(ach.achievement_date).toLocaleDateString('en-US',
+                                                                                                                    {
+                                                                                                                    month: 'short'
+                                                                                                                    ,
+                                                                                                                    year: 'numeric'
+                                                                                                                    })
+                                                                                                                    %>
+                                                                                                            </span>
+                                                                                                            <% } %>
+                                                                                            </div>
+                                                                            </div>
+                                                                            <% }) %>
+                                                                    </div>
+                                                                    <style>
+                                                                        .project-card .card-img {
+                                                                            width: 100%;
+                                                                            height: 200px;
+                                                                            object-fit: cover;
+                                                                            border-top-left-radius: 8px;
+                                                                            border-top-right-radius: 8px;
+                                                                        }
+
+                                                                        .achievement-img {
+                                                                            width: 120px;
+                                                                            height: 120px;
+                                                                            object-fit: cover;
+                                                                            border-radius: 8px;
+                                                                            flex-shrink: 0;
+                                                                            border: 1px solid rgba(255, 255, 255, 0.1);
+                                                                        }
+
+                                                                        .achievements-list {
+                                                                            display: flex;
+                                                                            flex-direction: column;
+                                                                            gap: 15px;
+                                                                            margin-top: 20px;
+                                                                        }
+
+                                                                        .achievement-item {
+                                                                            display: flex;
+                                                                            align-items: flex-start;
+                                                                            gap: 15px;
+                                                                            background: rgba(255, 255, 255, 0.05);
+                                                                            padding: 15px;
+                                                                            border-radius: 8px;
+                                                                            border: 1px solid rgba(0, 0, 0, 0.1);
+                                                                        }
+
+                                                                        .achievement-icon {
+                                                                            font-size: 1.5rem;
+                                                                        }
+
+                                                                        .achievement-content h3 {
+                                                                            margin: 0 0 5px 0;
+                                                                            font-size: 1.1rem;
+                                                                        }
+
+                                                                        .achievement-content p {
+                                                                            margin: 0 0 5px 0;
+                                                                            font-size: 0.95rem;
+                                                                            opacity: 0.8;
+                                                                        }
+
+                                                                        .achievement-date {
+                                                                            font-size: 0.85rem;
+                                                                            opacity: 0.6;
+                                                                        }
+
+                                                                        .theme-dynamic_codeverse .achievement-item,
+                                                                        .theme-dynamic_neural .achievement-item {
+                                                                            background: rgba(255, 255, 255, 0.1);
+                                                                            border: 1px solid rgba(255, 255, 255, 0.2);
+                                                                        }
+                                                                    </style>
+                                                                </section>
+                                                                <% } %>
 
                             </div> <!-- CLOSING CONTENT WRAPPER HERE TO FIX FOOTER WIDTH -->
 
