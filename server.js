@@ -70,6 +70,16 @@ app.use('/', portfolioRoutes);
 
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+
+// NEW: Wait for DB to be absolutely ready before starting
+initializeDatabase().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server fully synchronized and running on port ${PORT}`);
+    });
+}).catch(err => {
+    console.error("❌ CRITICAL: Database sync failed on startup:", err);
+    // Still start the server as a fallback, but we know things might fail
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running in FAIL-SAFE mode on port ${PORT}`);
+    });
 });
