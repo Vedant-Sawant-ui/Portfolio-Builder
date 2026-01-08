@@ -1,8 +1,8 @@
 const pool = require('../config/db');
 
 const LIMITS = {
-    GEMINI: 3,
-    GITHUB: 3
+    GEMINI: 100,
+    GITHUB: 100
 };
 
 /**

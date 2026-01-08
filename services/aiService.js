@@ -48,7 +48,6 @@ async function generateText(prompt, userId) {
     for (const modelName of modelsToTry) {
         try {
             console.log(`🤖 Attempting AI generation with model: ${modelName}`);
-            // Use v1 for 2.0 models, fallback to v1beta if 1.5/pro fail on v1
             const apiVer = (modelName.includes('2.0') || modelName.includes('2.5')) ? 'v1' : 'v1beta';
             
             const modelInstance = genAI.getGenerativeModel({ model: modelName }, { apiVersion: apiVer });
@@ -63,12 +62,16 @@ async function generateText(prompt, userId) {
             }
         } catch (error) {
             console.warn(`⚠️ Model ${modelName} failed: ${error.message}`);
+            // If it's an API key error or safety error, don't just loop through all models if they'll all fail for the same reason
+            if (error.message.includes('API key') || error.message.includes('safety')) {
+                throw error;
+            }
             lastError = error;
-            continue; // Try next model
+            continue; 
         }
     }
 
-    console.error("❌ All AI models failed.");
+    console.error("❌ All AI models failed. Last error:", lastError?.message);
     throw lastError || new Error("AI service currently unavailable. Please try again later.");
 }
 
