@@ -162,15 +162,15 @@
 
                     if (data.upgradedText) {
                         const improvedText = data.upgradedText;
-                        
+
                         let parent = inputEl.parentElement; // textarea is in .form-group usually or direct parent
                         // In this file, textarea is inside a .form-group.
-                        
+
                         let existingControl = parent.querySelector('.ai-controls');
                         if (existingControl) existingControl.remove();
 
                         inputEl.value = improvedText;
-                        inputEl.style.background = "#eff6ff"; 
+                        inputEl.style.background = "#eff6ff";
 
                         const controls = document.createElement('div');
                         controls.className = 'ai-controls';
@@ -181,23 +181,25 @@
                             <button type="button" class="btn btn-primary btn-sm" id="btn-accept" style="background: var(--success); border:none;">Accept</button>
                             <button type="button" class="btn btn-secondary btn-sm" id="btn-decline">Decline</button>
                         `;
-                        
+
                         inputEl.insertAdjacentElement('afterend', controls);
 
                         controls.querySelector('#btn-accept').addEventListener('click', () => {
-                             inputEl.style.background = "white";
-                             controls.remove();
+                            inputEl.style.background = "white";
+                            controls.remove();
                         });
 
                         controls.querySelector('#btn-decline').addEventListener('click', () => {
-                             inputEl.value = originalText;
-                             inputEl.style.background = "white";
-                             controls.remove();
+                            inputEl.value = originalText;
+                            inputEl.style.background = "white";
+                            controls.remove();
                         });
+                    } else if (data.error) {
+                        alert("AI Error: " + data.error);
                     }
                 } catch (e) {
                     console.error("AI Error", e);
-                    alert("Failed to connect to AI");
+                    alert("Failed to connect to AI Service.");
                 } finally {
                     statusEl.style.display = 'none';
                 }

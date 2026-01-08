@@ -185,10 +185,12 @@
                             inputEl.style.background = "white";
                             controls.remove();
                         });
+                    } else if (data.error) {
+                        alert("AI Error: " + data.error);
                     }
                 } catch (e) {
                     console.error("AI Error", e);
-                    alert("Failed to connect to AI");
+                    alert("Failed to connect to AI Service.");
                 } finally {
                     statusEl.style.display = 'none';
                 }
