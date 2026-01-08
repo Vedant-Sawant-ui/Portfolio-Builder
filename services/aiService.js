@@ -21,37 +21,51 @@ try {
 const { checkQuota, incrementUsage } = require('./usageService');
 
 /**
- * Generate text content from a prompt
- * @param {string} prompt 
- * @param {number} userId - Optional userId for rate limiting
- * @returns {Promise<string>}
+ * Robust text generation with model fallback
  */
 async function generateText(prompt, userId) {
-    if (!model) throw new Error("AI Model not initialized");
+    if (!apiKey) throw new Error("AI API Key not set.");
     if (!userId) throw new Error("Login to use AI features.");
-    // Check Quota if userId provided
-    if (userId) {
-        const hasQuota = await checkQuota(userId, 'GEMINI');
-        if (!hasQuota) {
-            throw new Error("Daily AI usage limit reached (3 requests/day). Please try again tomorrow.");
-        }
+
+    // 1. Quota Check
+    const hasQuota = await checkQuota(userId, 'GEMINI');
+    if (!hasQuota) {
+        throw new Error("Daily AI usage limit reached (3 requests/day). Please try again tomorrow.");
     }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        
-        // Increment usage on success
-        if (userId) {
-            await incrementUsage(userId, 'GEMINI');
+    // 2. Fallback Chain
+    const modelsToTry = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro"
+    ];
+
+    let lastError = null;
+
+    for (const modelName of modelsToTry) {
+        try {
+            console.log(`🤖 Attempting AI generation with model: ${modelName}`);
+            const modelInstance = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
+            const result = await modelInstance.generateContent(prompt);
+            const response = await result.response;
+            const text = response.text();
+            
+            if (text) {
+                console.log(`✅ AI success with ${modelName}`);
+                await incrementUsage(userId, 'GEMINI');
+                return text;
+            }
+        } catch (error) {
+            console.warn(`⚠️ Model ${modelName} failed: ${error.message}`);
+            lastError = error;
+            continue; // Try next model
         }
-        
-        return text;
-    } catch (error) {
-        console.error("AI Generation Error:", error);
-        throw error;
     }
+
+    console.error("❌ All AI models failed.");
+    throw lastError || new Error("AI service currently unavailable. Please try again later.");
 }
 
 module.exports = {

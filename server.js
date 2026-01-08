@@ -1,6 +1,5 @@
 require('dotenv').config(); 
 const { initializeDatabase } = require('./scripts/init-db');
-initializeDatabase(); // Ensure DB is ready on startup
 
 const express = require('express');
 const app = express();
