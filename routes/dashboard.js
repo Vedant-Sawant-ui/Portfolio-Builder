@@ -359,40 +359,46 @@ router.post('/api/upgrade-text', async (req, res) => {
 });
 
 // Parse Resume and Autofill
-router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
+const memoryStorage = multer.memoryStorage();
+const memoryUpload = multer({ storage: memoryStorage });
+
+router.post('/api/parse-resume', memoryUpload.single('resume'), async (req, res) => {
     if (!req.session.user_id) return res.redirect('/dashboard');
     const userId = req.session.user_id;
 
-    if (!req.file) {
+    if (!req.file || !req.file.buffer) {
+        console.error("❌ No file buffer received");
         return res.redirect('/dashboard');
     }
 
-    // Save Resume URL immediately
-    const resumeUrl = req.file.path;
+    // Capture buffer first
+    const dataBuffer = req.file.buffer;
+    console.log(`📦 Resume received in memory. Size: ${dataBuffer.byteLength} bytes`);
+
+    // 1. Upload to Cloudinary in background (or wait if we need URL)
+    // We already have the 'upload' (cloudinary parser) at the top of the file, 
+    // but for Autofill we want the TEXT immediately.
+    // Let's use the buffer for parsing and then save to Cloudinary.
+    
     try {
+        // Upload to Cloudinary (using memory buffer)
+        const uploadResult = await new Promise((resolve, reject) => {
+            const stream = require('../services/cloudinaryService').cloudinary.uploader.upload_stream(
+                { folder: 'portfolio_builder', resource_type: 'auto' },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            stream.end(dataBuffer);
+        });
+
+        const resumeUrl = uploadResult.secure_url;
         await pool.query('UPDATE profiles SET resume_url = $1 WHERE user_id = $2', [resumeUrl, userId]);
-    } catch (dbError) {
-        console.error("Database Error saving resume:", dbError);
-        return res.redirect('/dashboard');
-    }
+        console.log(`✅ Resume saved to Cloudinary: ${resumeUrl}`);
 
-    // Attempt Autofill (Parsing)
-    try {
-        console.log(`🔍 Fetching resume for parsing: ${req.file.path}`);
-        const response = await fetch(req.file.path);
-        
-        if (!response.ok) {
-            throw new Error(`Failed to fetch resume from storage (Status: ${response.status})`);
-        }
-
-        const dataBuffer = await response.arrayBuffer();
-        console.log(`📦 Resume received. Size: ${dataBuffer.byteLength} bytes`);
-
-        if (dataBuffer.byteLength === 0) {
-            throw new Error("Resume file is empty (0 bytes received)");
-        }
-
-        const pdfData = await pdf(Buffer.from(dataBuffer)); 
+        // 2. Parse PDF Text
+        const pdfData = await pdf(dataBuffer); 
         const extractedText = pdfData.text;
 
         if (!extractedText || extractedText.trim().length === 0) {

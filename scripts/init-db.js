@@ -55,13 +55,32 @@ async function initDB() {
         `);
         console.log("✅ Achievement Images table ready.");
 
-        // 5. Add any missing columns to profiles (e.g. for updates)
+        // 5. Create Skills, Projects, Socials, Achievements, Qualifications (Essentials)
+        await pool.query(`CREATE TABLE IF NOT EXISTS skills (id SERIAL PRIMARY KEY, user_id INTEGER, skill_name VARCHAR(255), proficiency_level VARCHAR(50) DEFAULT 'Intermediate');`);
+        await pool.query(`CREATE TABLE IF NOT EXISTS projects (id SERIAL PRIMARY KEY, user_id INTEGER, title VARCHAR(255), description TEXT, project_link TEXT, thumbnail_url TEXT);`);
+        await pool.query(`CREATE TABLE IF NOT EXISTS socials (id SERIAL PRIMARY KEY, user_id INTEGER, platform_name VARCHAR(255), platform_url TEXT);`);
+        await pool.query(`CREATE TABLE IF NOT EXISTS achievements (id SERIAL PRIMARY KEY, user_id INTEGER, title VARCHAR(255), description TEXT, image_url TEXT, achievement_date DATE DEFAULT CURRENT_DATE);`);
+        await pool.query(`CREATE TABLE IF NOT EXISTS qualifications (id SERIAL PRIMARY KEY, user_id INTEGER, type VARCHAR(50), title VARCHAR(255), organization VARCHAR(255), description TEXT, start_date DATE, end_date DATE, link_url TEXT, file_url TEXT);`);
+        
+        console.log("✅ All data tables checked/created.");
+
+        // 6. Add any missing columns to profiles
         const columns = await pool.query("SELECT column_name FROM information_schema.columns WHERE table_name = 'profiles'");
         const existingColumns = columns.rows.map(r => r.column_name);
         
-        if (!existingColumns.includes('is_published')) {
-            await pool.query("ALTER TABLE profiles ADD COLUMN is_published BOOLEAN DEFAULT FALSE");
-            console.log("➕ Added 'is_published' column.");
+        const missingCols = {
+            'is_published': 'BOOLEAN DEFAULT FALSE',
+            'leetcode_username': 'VARCHAR(100)',
+            'github_username': 'VARCHAR(100)',
+            'public_email': 'VARCHAR(255)',
+            'phone': 'VARCHAR(50)'
+        };
+
+        for (const [col, type] of Object.entries(missingCols)) {
+            if (!existingColumns.includes(col)) {
+                await pool.query(`ALTER TABLE profiles ADD COLUMN ${col} ${type}`);
+                console.log(`➕ Added missing column: ${col}`);
+            }
         }
 
         console.log("✨ Database Initialization Complete!");
