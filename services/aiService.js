@@ -10,8 +10,8 @@ try {
         console.warn("⚠️  WARNING: GEMINI_API_KEY is not set. AI features will fail.");
     } else {
         const genAI = new GoogleGenerativeAI(apiKey);
-        model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        console.log("✅ AI Service Initialized with model: gemini-2.5-flash");
+        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        console.log("✅ AI Service Initialized with model: gemini-1.5-flash");
     }
 } catch (error) {
     console.error("❌ Failed to initialize AI Service:", error);

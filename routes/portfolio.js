@@ -22,42 +22,32 @@ router.get("/:username", async (req, res) => {
     const userId = userResult.rows[0].id;
 
     // 2. Fetch all data in parallel (NOW INCLUDES SKILLS & ACHIEVEMENTS)
-    const profileQuery = pool.query("SELECT * FROM profiles WHERE user_id = $1", [userId]);
-    const projectsQuery = pool.query("SELECT * FROM projects WHERE user_id = $1", [userId]);
-    const socialsQuery = pool.query("SELECT * FROM socials WHERE user_id = $1", [userId]);
-    const skillsQuery = pool.query("SELECT * FROM skills WHERE user_id = $1", [userId]);
-    const achievementsQuery = pool.query("SELECT * FROM achievements WHERE user_id = $1 ORDER BY achievement_date DESC", [userId]);
-    const qualQuery = pool.query("SELECT * FROM qualifications WHERE user_id = $1 ORDER BY start_date DESC", [userId]);
-    
-    // NEW: Fetch additional images
-    const projectImagesQuery = pool.query(
-        "SELECT pi.* FROM project_images pi JOIN projects p ON pi.project_id = p.id WHERE p.user_id = $1", 
-        [userId]
-    );
-    const achievementImagesQuery = pool.query(
-        "SELECT ai.* FROM achievement_images ai JOIN achievements a ON ai.achievement_id = a.id WHERE a.user_id = $1", 
-        [userId]
-    );
+    let profileRes, projectsRes, socialsRes, skillsRes, achievementsRes, qualRes, projImgRes, achImgRes;
 
-    const [
-      profileRes,
-      projectsRes,
-      socialsRes,
-      skillsRes,
-      achievementsRes,
-      qualRes,
-      projImgRes,
-      achImgRes
-    ] = await Promise.all([
-      profileQuery,
-      projectsQuery,
-      socialsQuery,
-      skillsQuery,
-      achievementsQuery,
-      qualQuery,
-      projectImagesQuery,
-      achievementImagesQuery
-    ]);
+    try {
+        [
+            profileRes,
+            projectsRes,
+            socialsRes,
+            skillsRes,
+            achievementsRes,
+            qualRes,
+            projImgRes,
+            achImgRes
+        ] = await Promise.all([
+            pool.query("SELECT * FROM profiles WHERE user_id = $1", [userId]),
+            pool.query("SELECT * FROM projects WHERE user_id = $1", [userId]),
+            pool.query("SELECT * FROM socials WHERE user_id = $1", [userId]),
+            pool.query("SELECT * FROM skills WHERE user_id = $1", [userId]),
+            pool.query("SELECT * FROM achievements WHERE user_id = $1 ORDER BY achievement_date DESC", [userId]),
+            pool.query("SELECT * FROM qualifications WHERE user_id = $1 ORDER BY start_date DESC", [userId]),
+            pool.query("SELECT pi.* FROM project_images pi JOIN projects p ON pi.project_id = p.id WHERE p.user_id = $1", [userId]).catch(e => { console.warn("Missing project_images table"); return { rows: [] }; }),
+            pool.query("SELECT ai.* FROM achievement_images ai JOIN achievements a ON ai.achievement_id = a.id WHERE a.user_id = $1", [userId]).catch(e => { console.warn("Missing achievement_images table"); return { rows: [] }; })
+        ]);
+    } catch (dbErr) {
+        console.error("Database Fetch Error:", dbErr.message);
+        throw dbErr; // Still throw if core tables are missing
+    }
 
     const userProfile = profileRes.rows[0];
 

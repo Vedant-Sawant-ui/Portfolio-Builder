@@ -349,7 +349,7 @@ router.post('/api/upgrade-text', async (req, res) => {
     try {
         const prompt = `Upgrade or improve the following text in terms of english and grammar. Return ONLY the improved text, no explanation or conversational filler. Text: "${text}"`;
         
-        let upgradedText = await generateText(prompt);
+        let upgradedText = await generateText(prompt, req.session.user_id);
         upgradedText = upgradedText.trim();
         if (upgradedText.startsWith('"') && upgradedText.endsWith('"')) {
             upgradedText = upgradedText.slice(1, -1);
@@ -421,7 +421,7 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
             Return ONLY raw JSON. No markdown formatting.
         `;
         
-        const jsonResponse = await generateText(prompt);
+        const jsonResponse = await generateText(prompt, req.session.user_id);
         let jsonStr = jsonResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         
         let data = {};
