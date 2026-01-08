@@ -12,18 +12,18 @@ async function sendOTPEmail(email, otp) {
         return true; 
     }
 
-    // 2. Initialize transporter with explicit host for better reliability on cloud platforms
+    // 2. Initialize transporter with Port 587 (STARTTLS) for better cloud compatibility
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // use SSL
+        port: 587,
+        secure: false, // true for 465, false for 587 (STARTTLS)
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         },
-        connectionTimeout: 5000,
-        greetingTimeout: 5000,
-        socketTimeout: 5000
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,
+        socketTimeout: 10000
     });
 
     const mailOptions = {
