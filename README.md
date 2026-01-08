@@ -2,26 +2,28 @@
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://portfolio-builder-fdv7.onrender.com)
 [![Tech Stack](https://img.shields.io/badge/Stack-Node.js%20%7C%20Express%20%7C%20PostgreSQL-blue)](https://portfolio-builder-fdv7.onrender.com)
+[![AI Powered](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-orange)](https://google.ai)
 
-**Portfolio-Builder** is an AI-powered platform that converts your professional journey into a stunning, live portfolio in minutes. Stop manually formatting HTML—let AI build your brand while you focus on code.
+**Portfolio-Builder** is an AI-engineered platform that converts your professional journey into a high-impact, live portfolio in seconds. Forget manual formatting—let SOTA AI build your brand while you focus on building the future.
 
 ## ✨ Key Features
 
-- **🤖 AI Profile Upgrade**: Don't settle for boring bios. Use Gemini AI to professionally rephrase your profile and projects.
-- **📄 Instant Resume Parsing**: Upload a PDF, and watch the app extract your skills, socials, and experience automatically.
-- **📊 Real-time Analytics**: Live integration with **GitHub** and **LeetCode** to show off your repositories and problem-solving stats.
-- **🎨 Premium Themes**: Choose from modern, minimalist, and developer-focused themes that look great on any device.
-- **⚡ Instant Deployment**: Your portfolio is live the moment you hit "Publish."
+- **🪄 AI Content Engineering**: Professionally polish your biographies, project descriptions, and achievements using the **Gemini 2.x Flash** API.
+- **📄 Intelligent Resume Parsing**: Upload a PDF, and the app instantly extracts your skills, socials, and experience using AI-driven structured data parsing.
+- **📊 Real-time Developer Analytics**: Integrated with **GitHub** and **LeetCode** APIs to showcase your coding streak and problem-solving stats.
+- **🎨 Premium Theme Engine**: A curated selection of responsive, SEO-optimized themes tailored for modern developers.
+- **🔐 Privacy & Visibility Control**: Toggle between "Private" and "Published" modes. Includes a professional "Private Profile" view for secure drafts.
+- **🛰️ Dynamic Hosting Strategy**: Standardized URL generation for seamless sharing across local and production environments.
 
 ## 🛠️ Technology Stack
 
-- **Backend**: Node.js, Express.js
-- **Database**: PostgreSQL (via Neon.tech)
-- **AI**: Google Gemini API (2.5 Flash)
-- **Auth**: Firebase Admin SDK & Hybrid Session Management
-- **Media**: Cloudinary CDN
-- **Email**: Brevo Transactional API
-- **Frontend**: EJS (Server-side rendering), Vanilla CSS
+- **Backend**: Node.js, Express.js (High-performance API orchestration)
+- **Database**: PostgreSQL (via Neon.tech Serverless)
+- **AI Layer**: Google Gemini API (2.0/2.5 Flash Fallback Chain)
+- **Auth**: Firebase Admin SDK & PostgreSQL Hybrid Session Management
+- **Media**: Cloudinary CDN (Persistent Global Image Hosting)
+- **Email**: Brevo Transactional API (HTTPS-based bypass for SMTP port blocks)
+- **Frontend**: EJS + Vanilla CSS (SEO-friendly SSR with granular design control)
 
 ## ⚙️ Setting Up Locally
 
@@ -59,10 +61,10 @@ FIREBASE_SERVICE_ACCOUNT_JSON=your_json_string
 npm run dev
 ```
 
-## 🛡️ Security & Performance
-- **Optimized for Render**: Engineered to run efficiently on free-tier cloud resources.
-- **Strict Timeouts**: 5s timeouts on all external calls to prevent application hangs.
-- **Secure Handling**: No hardcoded secrets; full environment variable integration.
+## 🛡️ Security & Resilience
+- **Indestructible Sync**: Transactional database initialization ensures schema stability on every deploy.
+- **Strict Timeouts**: 5s timeouts on all external service calls to prevent application hangs.
+- **Fail-Safe AI**: Intelligent model rotation between Gemini 2.0, 2.5, and 1.5 to guarantee uptime.
 
 ## 🤝 Contributing
 Feel free to fork this project, open issues, or submit PRs!
