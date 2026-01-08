@@ -8,10 +8,29 @@
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        .ai-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .ai-btn:hover {
+            opacity: 0.9;
+        }
+
         .ai-status {
             font-size: 0.8rem;
             color: var(--primary);
-            margin-left: auto;
+            margin-left: 10px;
             display: none;
             align-items: center;
             gap: 5px;
@@ -43,7 +62,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Title</label>
+                        <label class="form-label">Title *</label>
                         <input type="text" name="title" class="form-input"
                             placeholder="e.g. AWS Certified Cloud Practitioner" required>
                     </div>
@@ -58,11 +77,17 @@
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <label class="form-label" style="margin-bottom: 0;">Description</label>
-                            <span id="qual-ai-status" class="ai-status"><i class="fas fa-spinner fa-spin"></i> Improving
-                                Grammar...</span>
+                            <div style="display: flex; align-items: center;">
+                                <span id="qual-ai-status" class="ai-status"><i class="fas fa-spinner fa-spin"></i>
+                                    Improving...</span>
+                                <button type="button" class="ai-btn"
+                                    onclick="upgradeText('qual-desc', 'qual-ai-status')">
+                                    <i class="fas fa-sparkles"></i> Upgrade with AI
+                                </button>
+                            </div>
                         </div>
                         <textarea id="qual-desc" name="description" class="form-textarea" rows="3"
-                            placeholder="Brief details... (Auto-improves on stop)"></textarea>
+                            placeholder="Brief details..."></textarea>
                     </div>
 
                     <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -97,46 +122,66 @@
         </div>
 
         <script>
-            // AI Auto-Trigger Logic
-            function debounce(func, wait) {
-                let timeout;
-                return function(...args) {
-                    const context = this;
-                    clearTimeout(timeout);
-                    timeout = setTimeout(() => func.apply(context, args), wait);
-                };
-            }
+            // AI Upgrade Logic
+            async function upgradeText(inputId, statusId) {
+                const inputEl = document.getElementById(inputId);
+                const statusEl = document.getElementById(statusId);
+                const originalText = inputEl.value;
 
-            const qualInput = document.getElementById('qual-desc');
-            const qualStatus = document.getElementById('qual-ai-status');
+                if (!originalText || originalText.length < 5) {
+                    alert("Please enter some text first.");
+                    return;
+                }
 
-            const improveQual = async () => {
-                const text = qualInput.value;
-                if (!text || text.length < 5) return;
+                statusEl.style.display = 'inline-flex';
 
-                qualStatus.style.display = 'flex';
-                
                 try {
                     const response = await fetch('/dashboard/api/upgrade-text', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: text })
+                        body: JSON.stringify({ text: originalText })
                     });
                     const data = await response.json();
-                    
-                    if(data.upgradedText && data.upgradedText !== text) {
-                        qualInput.value = data.upgradedText;
-                        qualInput.style.backgroundColor = "#f0fdfa";
-                        setTimeout(() => qualInput.style.backgroundColor = "white", 1000);
-                    }
-                } catch (err) {
-                    console.error("AI Error", err);
-                } finally {
-                    qualStatus.style.display = 'none';
-                }
-            };
 
-            qualInput.addEventListener('input', debounce(improveQual, 2000));
+                    if (data.upgradedText) {
+                        const improvedText = data.upgradedText;
+                        let parent = inputEl.parentElement;
+                        let existingControl = parent.querySelector('.ai-controls');
+                        if (existingControl) existingControl.remove();
+
+                        inputEl.value = improvedText;
+                        inputEl.style.background = "#eff6ff";
+
+                        const controls = document.createElement('div');
+                        controls.className = 'ai-controls';
+                        controls.style.marginTop = '10px';
+                        controls.style.display = 'flex';
+                        controls.style.gap = '10px';
+                        controls.innerHTML = `
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-accept" style="background: var(--success); border:none; padding:4px 12px; font-size:0.8rem;">Accept</button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-decline" style="padding:4px 12px; font-size:0.8rem;">Decline</button>
+                        `;
+
+                        inputEl.insertAdjacentElement('afterend', controls);
+
+                        controls.querySelector('#btn-accept').addEventListener('click', () => {
+                            inputEl.style.background = "white";
+                            controls.remove();
+                        });
+
+                        controls.querySelector('#btn-decline').addEventListener('click', () => {
+                            inputEl.value = originalText;
+                            inputEl.style.background = "white";
+                            controls.remove();
+                        });
+                    }
+                } catch (e) {
+                    console.error("AI Error", e);
+                    alert("Failed to connect to AI");
+                } finally {
+                    statusEl.style.display = 'none';
+                }
+            }
         </script>
 </body>
 
