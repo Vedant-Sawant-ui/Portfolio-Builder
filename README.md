@@ -17,7 +17,7 @@
 
 - **Backend**: Node.js, Express.js
 - **Database**: PostgreSQL (via Neon.tech)
-- **AI**: Google Gemini API (1.5 Flash)
+- **AI**: Google Gemini API (2.5 Flash)
 - **Auth**: Firebase Admin SDK & Hybrid Session Management
 - **Media**: Cloudinary CDN
 - **Email**: Brevo Transactional API
