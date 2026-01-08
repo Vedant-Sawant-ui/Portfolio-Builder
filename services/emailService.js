@@ -49,10 +49,18 @@ async function sendOTPEmail(email, otp) {
         console.log(`✅ Real OTP email sent to ${email}`);
         return true;
     } catch (error) {
-        console.error('❌ Error sending real email:', error.message);
-        console.log('--- FALLING BACK TO CONSOLE ---');
+        console.error('❌ Nodemailer Error:', error.message);
+        console.error('❌ Error Code:', error.code);
+        console.error('❌ Stack:', error.stack);
+        
+        // In production, we want to know if it failed
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Email failed: ${error.message}`);
+        }
+
+        console.log('--- FALLBACK TO CONSOLE (Local/Dev) ---');
         console.log(`OTP for ${email}: ${otp}`);
-        return true; // Still return true so the user isn't stuck if SMTP fails
+        return true; 
     }
 }
 
