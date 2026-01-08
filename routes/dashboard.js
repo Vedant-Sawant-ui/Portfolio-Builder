@@ -43,6 +43,8 @@ router.get("/", async (req, res) => {
       bio: "",
     };
 
+    const baseUrl = req.protocol + '://' + req.get('host');
+
     res.render("dashboard", {
       profile: userProfile,
       projects: projectsRes.rows,
@@ -51,7 +53,8 @@ router.get("/", async (req, res) => {
       socialsMap: socialsMap,
       qualifications: qualRes.rows,
       username: req.session.username,
-      user: { username: req.session.username } // Ensure user object exists for header
+      user: { username: req.session.username }, // Ensure user object exists for header
+      baseUrl: baseUrl
     });
   } catch (err) {
     console.error("Dashboard Crash:", err);

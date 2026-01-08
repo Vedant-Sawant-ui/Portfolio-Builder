@@ -178,11 +178,11 @@
                                 style="font-size: 0.85rem; font-weight: 600; color: var(--slate-600); display: block; margin-bottom: 5px;">Your
                                 Portfolio Link:</label>
                             <div style="display: flex; gap: 10px;">
-                                <input type="text" value="<%= 'http://localhost:3000/' + user.username %>" readonly
+                                <input type="text" value="<%= baseUrl + '/' + user.username %>" readonly
                                     class="form-input" style="background: white;" id="portfolio-link-input">
                                 <button class="btn btn-primary" onclick="copyLinkInput()"><i class="fas fa-copy"></i>
                                     Copy</button>
-                                <a href="/<%= user.username %>" target="_blank" class="btn btn-secondary"><i
+                                <a href="<%= '/' + user.username %>" target="_blank" class="btn btn-secondary"><i
                                         class="fas fa-external-link-alt"></i>
                                     View</a>
                             </div>

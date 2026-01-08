@@ -57,7 +57,7 @@ router.get("/:username", async (req, res) => {
 
     // --- SMART GATEKEEPING ---
     if (!userProfile.is_published && viewerId !== userId) {
-       return res.render('error-page', { message: "This portfolio is currently private." }); 
+       return res.render('private'); 
     }
     
     // Map images to projects
