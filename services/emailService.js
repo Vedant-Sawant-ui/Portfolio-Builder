@@ -1,34 +1,19 @@
-const nodemailer = require('nodemailer');
-
 /**
- * Sends a 6-digit OTP to the specified email.
+ * Sends a 6-digit OTP to the specified email using Resend API.
+ * This bypasses Render's SMTP blocks by using HTTPS.
  */
 async function sendOTPEmail(email, otp) {
-    // 1. Check for credentials first
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.warn('⚠️ EMAIL_USER or EMAIL_PASS not found in .env');
+    // 1. Check for API Key first
+    if (!process.env.RESEND_API_KEY) {
+        console.warn('⚠️ RESEND_API_KEY not found in environment');
         console.log('--- LOCAL DEV FALLBACK ---');
         console.log(`OTP for ${email}: ${otp}`);
         return true; 
     }
 
-    // 2. Initialize transporter with Port 587 (STARTTLS) for better cloud compatibility
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // true for 465, false for 587 (STARTTLS)
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 10000,
-        socketTimeout: 10000
-    });
-
-    const mailOptions = {
-        from: `"Portfolio Builder" <${process.env.EMAIL_USER}>`,
-        to: email,
+    const payload = {
+        from: 'Portfolio Builder <onboarding@resend.dev>',
+        to: [email],
         subject: 'User Verification OTP',
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
@@ -45,20 +30,31 @@ async function sendOTPEmail(email, otp) {
     };
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log(`✅ Real OTP email sent to ${email}`);
-        return true;
-    } catch (error) {
-        console.error('❌ Nodemailer Error:', error.message);
-        console.error('❌ Error Code:', error.code);
-        console.error('❌ Stack:', error.stack);
-        
-        // In production, we want to know if it failed
-        if (process.env.NODE_ENV === 'production') {
-            throw new Error(`Email failed: ${error.message}`);
+        const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to send email via Resend');
         }
 
-        console.log('--- FALLBACK TO CONSOLE (Local/Dev) ---');
+        console.log(`✅ OTP email sent via Resend to ${email} (ID: ${data.id})`);
+        return true;
+    } catch (error) {
+        console.error('❌ Resend API Error:', error.message);
+        
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Email delivery failed: ${error.message}`);
+        }
+
+        console.log('--- FALLBACK TO CONSOLE ---');
         console.log(`OTP for ${email}: ${otp}`);
         return true; 
     }
