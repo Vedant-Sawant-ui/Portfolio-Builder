@@ -35,11 +35,12 @@ async function generateText(prompt, userId) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // 2. Fallback Chain
+    // 2. Fallback Chain (Verified models for this API Key)
     const modelsToTry = [
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
-        "gemini-pro"
+        "gemini-2.0-flash", // Primary (Fast & Smart)
+        "gemini-2.5-flash", // Newer variant
+        "gemini-1.5-flash", // Original (Try as fallback)
+        "gemini-pro"        // Legacy/Stable
     ];
 
     let lastError = null;
@@ -47,7 +48,10 @@ async function generateText(prompt, userId) {
     for (const modelName of modelsToTry) {
         try {
             console.log(`🤖 Attempting AI generation with model: ${modelName}`);
-            const modelInstance = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
+            // Use v1 for 2.0 models, fallback to v1beta if 1.5/pro fail on v1
+            const apiVer = (modelName.includes('2.0') || modelName.includes('2.5')) ? 'v1' : 'v1beta';
+            
+            const modelInstance = genAI.getGenerativeModel({ model: modelName }, { apiVersion: apiVer });
             const result = await modelInstance.generateContent(prompt);
             const response = await result.response;
             const text = response.text();
