@@ -1,21 +1,22 @@
 /**
- * Sends a 6-digit OTP to the specified email using Resend API.
- * This bypasses Render's SMTP blocks by using HTTPS.
+ * Sends a 6-digit OTP to the specified email using Brevo API.
+ * This bypasses Render's SMTP blocks and allows sending to anyone 
+ * without needing a custom domain.
  */
 async function sendOTPEmail(email, otp) {
-    // 1. Check for API Key first
-    if (!process.env.RESEND_API_KEY) {
-        console.warn('⚠️ RESEND_API_KEY not found in environment');
+    // 1. Check for API Key and Sender
+    if (!process.env.BREVO_API_KEY || !process.env.EMAIL_USER) {
+        console.warn('⚠️ BREVO_API_KEY or EMAIL_USER missing in environment');
         console.log('--- LOCAL DEV FALLBACK ---');
         console.log(`OTP for ${email}: ${otp}`);
         return true; 
     }
 
     const payload = {
-        from: 'Portfolio Builder <onboarding@resend.dev>',
-        to: [email],
+        sender: { name: "Portfolio Builder", email: process.env.EMAIL_USER },
+        to: [{ email: email }],
         subject: 'User Verification OTP',
-        html: `
+        htmlContent: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
                 <h2 style="color: #6366f1; text-align: center;">Verification Code</h2>
                 <p style="color: #475569; font-size: 1rem;">Use the OTP below to verify your email. This code is valid for <strong>5 minutes</strong>.</p>
@@ -30,11 +31,12 @@ async function sendOTPEmail(email, otp) {
     };
 
     try {
-        const response = await fetch('https://api.resend.com/emails', {
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+                'accept': 'application/json',
+                'api-key': process.env.BREVO_API_KEY,
+                'content-type': 'application/json'
             },
             body: JSON.stringify(payload)
         });
@@ -42,15 +44,14 @@ async function sendOTPEmail(email, otp) {
         const data = await response.json();
 
         if (!response.ok) {
-            // Log the specific error for the developer
-            console.error('❌ Resend API Error:', data.message || response.statusText);
-            return false; // Return false so the route can handle it
+            console.error('❌ Brevo API Error:', data.message || response.statusText);
+            return false;
         }
 
-        console.log(`✅ OTP email sent via Resend to ${email} (ID: ${data.id})`);
+        console.log(`✅ OTP email sent via Brevo to ${email} (ID: ${data.messageId})`);
         return true;
     } catch (error) {
-        console.error('❌ Resend Network/Fetch Error:', error.message);
+        console.error('❌ Brevo Network Error:', error.message);
         return false; 
     }
 }
