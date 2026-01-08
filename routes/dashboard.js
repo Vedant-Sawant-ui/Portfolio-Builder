@@ -378,10 +378,27 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
 
     // Attempt Autofill (Parsing)
     try {
+        console.log(`🔍 Fetching resume for parsing: ${req.file.path}`);
         const response = await fetch(req.file.path);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch resume from storage (Status: ${response.status})`);
+        }
+
         const dataBuffer = await response.arrayBuffer();
+        console.log(`📦 Resume received. Size: ${dataBuffer.byteLength} bytes`);
+
+        if (dataBuffer.byteLength === 0) {
+            throw new Error("Resume file is empty (0 bytes received)");
+        }
+
         const pdfData = await pdf(Buffer.from(dataBuffer)); 
         const extractedText = pdfData.text;
+
+        if (!extractedText || extractedText.trim().length === 0) {
+            console.warn("⚠️ PDF parsed but no text was extracted.");
+            return res.redirect('/dashboard');
+        }
 
         // Comprehensive Prompt
         const prompt = `
@@ -412,13 +429,12 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
             data = JSON.parse(jsonStr);
         } catch (parseError) {
             console.error("AI JSON Parse Error:", parseError);
+            console.log("Raw Response received:", jsonStr);
             data = {}; 
         }
 
         // 1. Update Profile (Name, Bio, Contact)
         if (data.full_name || data.bio || data.public_email || data.phone) {
-             // Fetch current to avoid overwriting with nulls if we want partial updates? 
-             // Logic below uses COALESCE to only update if new value provided.
              await pool.query(
                 `UPDATE profiles 
                  SET full_name = COALESCE($1, full_name), 
@@ -448,7 +464,6 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
             await pool.query('DELETE FROM socials WHERE user_id = $1', [userId]);
             for (const [platform, url] of Object.entries(data.socials)) {
                 if (url && typeof url === 'string') {
-                    // Normalize platform name
                     let pName = platform.toLowerCase();
                     if(pName.includes('linked')) pName = 'linkedin';
                     else if(pName.includes('git')) pName = 'github';
@@ -462,24 +477,37 @@ router.post('/api/parse-resume', upload.single('resume'), async (req, res) => {
         }
 
         // 4. Insert Projects (Append)
-        if(data.projects) {
-            for(const p of data.projects) await pool.query('INSERT INTO projects (user_id, title, description) VALUES ($1,$2,$3)', [userId, p.title||'New Project', p.description||'']);
+        if(data.projects && Array.isArray(data.projects)) {
+            for(const p of data.projects) {
+                if(p.title) {
+                    await pool.query('INSERT INTO projects (user_id, title, description) VALUES ($1,$2,$3)', [userId, p.title, p.description||'']);
+                }
+            }
         }
 
         // 5. Insert Achievements (Append)
-        if(data.achievements) {
-            for(const a of data.achievements) await pool.query('INSERT INTO achievements (user_id, title, description, achievement_date) VALUES ($1,$2,$3,$4)', [userId, a.title||'Achievement', a.description||'', a.date || new Date()]);
+        if(data.achievements && Array.isArray(data.achievements)) {
+            for(const a of data.achievements) {
+                if(a.title) {
+                    await pool.query('INSERT INTO achievements (user_id, title, description, achievement_date) VALUES ($1,$2,$3,$4)', [userId, a.title, a.description||'', a.date || new Date()]);
+                }
+            }
         }
 
         // 6. Insert Qualifications (Append)
-        if(data.qualifications) {
-             for(const q of data.qualifications) await pool.query('INSERT INTO qualifications (user_id, type, title, organization, description, start_date, end_date) VALUES ($1,$2,$3,$4,$5,$6,$7)', 
-                [userId, q.type||'Education', q.title||'Degree', q.organization||'School', q.description||'', q.start_date || null, q.end_date || null]);
+        if(data.qualifications && Array.isArray(data.qualifications)) {
+             for(const q of data.qualifications) {
+                if(q.title) {
+                    await pool.query('INSERT INTO qualifications (user_id, type, title, organization, description, start_date, end_date) VALUES ($1,$2,$3,$4,$5,$6,$7)', 
+                        [userId, q.type||'Education', q.title, q.organization||'School', q.description||'', q.start_date || null, q.end_date || null]);
+                }
+             }
         }
         
+        console.log("✅ Autofill completed successfully.");
+
     } catch(e) { 
-        console.error("Autofill Error (Continuing without autofill):", e); 
-        // We do NOT redirect here, we proceed to redirect /dashboard below so the file is still accepted.
+        console.error("❌ Autofill Error:", e.message); 
     }
 
     res.redirect('/dashboard');
