@@ -4,13 +4,18 @@ const { Pool } = require('pg');
 // Create a new pool instance using values from .env
 const pool = new Pool(
     process.env.DATABASE_URL 
-    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+    ? { 
+        connectionString: process.env.DATABASE_URL, 
+        ssl: { rejectUnauthorized: false },
+        connectionTimeoutMillis: 5000
+      }
     : {
         host: process.env.DB_HOST,
         port: process.env.DB_PORT,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
+        connectionTimeoutMillis: 5000
       }
 );
 

@@ -82,11 +82,16 @@ router.post('/login', async (req, res) => {
 
         try {
             if (admin.apps.length > 0) {
-                await admin.auth().getUserByEmail(email);
+                // Add a 3-second timeout to Firebase check to prevent hangs
+                const fbCheck = Promise.race([
+                    admin.auth().getUserByEmail(email),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase Timeout')), 3000))
+                ]);
+                await fbCheck;
                 console.log(`✅ User ${email} verified in Firebase`);
             }
         } catch (fbErr) {
-            console.warn('⚠️ Firebase Login Sync Warning:', fbErr.message);
+            console.warn('⚠️ Firebase Login Sync skipped or timed out:', fbErr.message);
         }
 
         const user = result.rows[0];
