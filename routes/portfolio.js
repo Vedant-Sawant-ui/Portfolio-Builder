@@ -51,6 +51,10 @@ router.get("/:username", async (req, res) => {
 
     const userProfile = profileRes.rows[0];
 
+    if (!userProfile) {
+        return res.status(404).send("User profile not found. Please set up your profile in the dashboard.");
+    }
+
     // --- SMART GATEKEEPING ---
     if (!userProfile.is_published && viewerId !== userId) {
        return res.render('error-page', { message: "This portfolio is currently private." }); 
@@ -79,8 +83,8 @@ router.get("/:username", async (req, res) => {
       theme: profileRes.rows[0].theme_preference || "minimalist",
     });
   } catch (err) {
-    console.error(err.message);
-    res.send("Server Error");
+    console.error("Portfolio Rendering Error:", err.stack);
+    res.status(500).send("Server Error: " + err.message);
   }
 });
 
