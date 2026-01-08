@@ -49,7 +49,15 @@ router.post('/register', async (req, res) => {
         );
 
         // Send OTP Email
-        await sendOTPEmail(email, otp);
+        const emailSent = await sendOTPEmail(email, otp);
+
+        if (!emailSent) {
+            return res.render('register', { 
+                errors: [{ msg: 'Email delivery failed. If you are using a free Resend account, you can only send emails to your own registered address (Sandbox Mode).' }],
+                email,
+                username 
+            });
+        }
 
         // Store temp registration data in session
         req.session.temp_user = { email, username };
@@ -268,7 +276,12 @@ router.post('/forgot-password', async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
         await pool.query('INSERT INTO password_reset_otps (email, otp, expires_at) VALUES ($1, $2, $3)', [email, otp, expiresAt]);
-        await sendOTPEmail(email, otp);
+        
+        const emailSent = await sendOTPEmail(email, otp);
+        if (!emailSent) {
+            req.flash('error_msg', 'Email delivery failed. (Sandbox Restriction: Only verified emails work).');
+            return res.redirect('/forgot-password');
+        }
 
         res.redirect(`/verify-otp?mode=reset&email=${encodeURIComponent(email)}`);
     } catch (err) {

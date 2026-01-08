@@ -42,21 +42,16 @@ async function sendOTPEmail(email, otp) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Failed to send email via Resend');
+            // Log the specific error for the developer
+            console.error('❌ Resend API Error:', data.message || response.statusText);
+            return false; // Return false so the route can handle it
         }
 
         console.log(`✅ OTP email sent via Resend to ${email} (ID: ${data.id})`);
         return true;
     } catch (error) {
-        console.error('❌ Resend API Error:', error.message);
-        
-        if (process.env.NODE_ENV === 'production') {
-            throw new Error(`Email delivery failed: ${error.message}`);
-        }
-
-        console.log('--- FALLBACK TO CONSOLE ---');
-        console.log(`OTP for ${email}: ${otp}`);
-        return true; 
+        console.error('❌ Resend Network/Fetch Error:', error.message);
+        return false; 
     }
 }
 
